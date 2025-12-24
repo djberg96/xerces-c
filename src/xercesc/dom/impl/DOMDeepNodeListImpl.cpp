@@ -97,7 +97,7 @@ DOMNode *DOMDeepNodeListImpl::item(XMLSize_t index) const
 // irrelevant ones.  Doing so in a really useful manner would seem
 // to involve a tree-walk in its own right, or maintaining our data
 // in a parallel tree.
-DOMNode *DOMDeepNodeListImpl::cacheItem(XMLSize_t index)
+DOMNode *DOMDeepNodeListImpl::cacheItem(XMLSize_t index) const
 {
     XMLSize_t currentIndexPlus1 = fCurrentIndexPlus1;
     DOMNode *currentNode = fCurrentNode;
@@ -156,7 +156,7 @@ DOMNode *DOMDeepNodeListImpl::cacheItem(XMLSize_t index)
 need to resort to recursion. NOTE THAT only Element nodes are matched
 since we're specifically supporting getElementsByTagName().
 */
-DOMNode *DOMDeepNodeListImpl::nextMatchingElementAfter(DOMNode *current)
+DOMNode *DOMDeepNodeListImpl::nextMatchingElementAfter(DOMNode *current) const
 {
     DOMNode *next;
     while (current != 0)

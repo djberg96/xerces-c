@@ -45,9 +45,9 @@ protected:
     const DOMNode*   fRootNode;
     const XMLCh*     fTagName;
     bool             fMatchAll;
-    int              fChanges;
-    DOMNode*         fCurrentNode;
-    XMLSize_t        fCurrentIndexPlus1;
+    mutable int      fChanges;
+    mutable DOMNode* fCurrentNode;
+    mutable XMLSize_t fCurrentIndexPlus1;
 
     //DOM Level 2
     const XMLCh*     fNamespaceURI;
@@ -62,10 +62,10 @@ public:
     virtual          ~DOMDeepNodeListImpl();
     virtual XMLSize_t    getLength() const;
     virtual DOMNode*     item(XMLSize_t index) const;
-    DOMNode*             cacheItem(XMLSize_t index);
+    DOMNode*             cacheItem(XMLSize_t index) const;
 
 protected:
-    DOMNode*          nextMatchingElementAfter(DOMNode *current);
+    DOMNode*          nextMatchingElementAfter(DOMNode *current) const;
 
 private:
     // -----------------------------------------------------------------------

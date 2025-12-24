@@ -56,9 +56,9 @@ DOMElementNSImpl::DOMElementNSImpl(DOMDocument *ownerDoc,
                                    const XMLCh *qualifiedName)
     : DOMElementImpl(ownerDoc, qualifiedName)
 {
-  this->fSchemaType = 0;
+  this->fSchemaType = nullptr;
 
-  DOMDocumentImpl* docImpl = (DOMDocumentImpl*)fParent.fOwnerDocument;
+  DOMDocumentImpl* docImpl = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
 
   if (prefix == 0 || *prefix == 0)
   {
@@ -125,7 +125,7 @@ void DOMElementNSImpl::setPrefix(const XMLCh *prefix)
         return;
     }
 
-    DOMDocumentImpl* doc = (DOMDocumentImpl*) fParent.fOwnerDocument;
+    DOMDocumentImpl* doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
 
     if(!doc->isXMLName(prefix))
         throw DOMException(DOMException::INVALID_CHARACTER_ERR,0, GetDOMNodeMemoryManager);
@@ -150,10 +150,10 @@ void DOMElementNSImpl::setPrefix(const XMLCh *prefix)
     XMLCh *newName;
     XMLCh temp[256];
     if (newQualifiedNameLen >= 255)
-      newName = (XMLCh*) doc->getMemoryManager()->allocate
+      newName = static_cast<XMLCh*>(doc->getMemoryManager()->allocate
         (
             newQualifiedNameLen * sizeof(XMLCh)
-        );//new XMLCh[newQualifiedNameLen];
+        ));//new XMLCh[newQualifiedNameLen];
     else
         newName = temp;
 
@@ -174,7 +174,7 @@ void DOMElementNSImpl::release()
     if (fNode.isOwned() && !fNode.isToBeReleased())
         throw DOMException(DOMException::INVALID_ACCESS_ERR,0, GetDOMNodeMemoryManager);
 
-    DOMDocumentImpl* doc = (DOMDocumentImpl*) fParent.fOwnerDocument;
+    DOMDocumentImpl* doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
     if (doc) {
         fNode.callUserDataHandlers(DOMUserDataHandler::NODE_DELETED, 0, 0);
         fParent.release();
