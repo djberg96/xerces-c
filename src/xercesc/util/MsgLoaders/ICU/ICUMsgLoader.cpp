@@ -157,8 +157,12 @@ ICUMsgLoader::ICUMsgLoader(const XMLCh* const  msgDomain)
 	Open the locale-specific resource bundle
     ***/
     size_t currentLen = strlen(locationBuf);
-    if (currentLen < sizeof(locationBuf) - 1) {
+    size_t bundleNameLen = strlen(BUNDLE_NAME);
+    if (currentLen + bundleNameLen < sizeof(locationBuf)) {
         snprintf(locationBuf + currentLen, sizeof(locationBuf) - currentLen, "%s", BUNDLE_NAME);
+    } else {
+        // Buffer would overflow, just use the bundle name alone
+        snprintf(locationBuf, sizeof(locationBuf), "%s", BUNDLE_NAME);
     }
     UErrorCode err = U_ZERO_ERROR;
     uloc_setDefault("root", &err);   // in case user-specified locale unavailable
