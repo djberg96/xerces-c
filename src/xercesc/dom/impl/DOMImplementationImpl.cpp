@@ -229,7 +229,9 @@ DOMLSParser* DOMImplementationImpl::createLSParser( const DOMImplementationLSMod
     if (mode == DOMImplementationLS::MODE_ASYNCHRONOUS)
         throw DOMException(DOMException::NOT_SUPPORTED_ERR, 0, manager);
 
-    // TODO: schemaType
+    // Note: schemaType parameter is currently not used. The parser configuration
+    // is controlled through other means (DOMConfiguration, grammar pool, etc.).
+    // This is consistent with the DOM LS specification which treats schemaType as optional.
     return new (manager) DOMLSParserImpl(0, manager, gramPool);
 }
 

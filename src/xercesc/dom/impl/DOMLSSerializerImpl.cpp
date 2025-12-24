@@ -412,7 +412,8 @@ bool DOMLSSerializerImpl::write(const DOMNode* nodeToWrite,
         const XMLCh* szSystemId=destination->getSystemId();
         if(!szSystemId)
         {
-            //TODO: report error "missing target"
+            // Report error for missing target
+            reportError(nodeToWrite, DOMError::DOM_SEVERITY_ERROR, XMLDOMMsg::SERIALIZE_ERR);
             return false;
         }
         pTarget=new LocalFileFormatTarget(szSystemId, fMemoryManager);

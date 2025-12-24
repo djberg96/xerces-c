@@ -1117,7 +1117,7 @@ XMLStringPool* XSerializeEngine::getStringPool() const
 
 MemoryManager* XSerializeEngine::getMemoryManager() const
 {
-    //todo: changed to return fGrammarPool->getMemoryManager()
+    // Return the grammar pool's memory manager if available, otherwise use the default
     return fGrammarPool ? fGrammarPool->getMemoryManager() : XMLPlatformUtils::fgMemoryManager;
 }
 

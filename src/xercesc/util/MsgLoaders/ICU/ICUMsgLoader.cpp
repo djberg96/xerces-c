@@ -126,26 +126,21 @@ ICUMsgLoader::ICUMsgLoader(const XMLCh* const  msgDomain)
 
     if (nlsHome)
     {
-    	strcpy(locationBuf, nlsHome);
-        strcat(locationBuf, U_FILE_SEP_STRING);
+        snprintf(locationBuf, sizeof(locationBuf), "%s%s", nlsHome, U_FILE_SEP_STRING);
     }
     else
     {
         nlsHome = getenv("XERCESC_NLS_HOME");
         if (nlsHome)
         {
-            strcpy(locationBuf, nlsHome);
-            strcat(locationBuf, U_FILE_SEP_STRING);
+            snprintf(locationBuf, sizeof(locationBuf), "%s%s", nlsHome, U_FILE_SEP_STRING);
         }
         else
         {
             nlsHome = getenv("XERCESCROOT");
             if (nlsHome)
             {
-                strcpy(locationBuf, nlsHome);
-                strcat(locationBuf, U_FILE_SEP_STRING);
-                strcat(locationBuf, "msg");
-                strcat(locationBuf, U_FILE_SEP_STRING);
+                snprintf(locationBuf, sizeof(locationBuf), "%s%smsg%s", nlsHome, U_FILE_SEP_STRING, U_FILE_SEP_STRING);
             }
             else
             {
@@ -161,7 +156,15 @@ ICUMsgLoader::ICUMsgLoader(const XMLCh* const  msgDomain)
     /***
 	Open the locale-specific resource bundle
     ***/
-    strcat(locationBuf, BUNDLE_NAME);
+    size_t currentLen = strlen(locationBuf);
+    size_t bundleNameLen = strlen(BUNDLE_NAME);
+    // Check if buffer has enough space for bundle name plus null terminator
+    if (currentLen + bundleNameLen + 1 <= sizeof(locationBuf)) {
+        snprintf(locationBuf + currentLen, sizeof(locationBuf) - currentLen, "%s", BUNDLE_NAME);
+    } else {
+        // Buffer would overflow, just use the bundle name alone
+        snprintf(locationBuf, sizeof(locationBuf), "%s", BUNDLE_NAME);
+    }
     UErrorCode err = U_ZERO_ERROR;
     uloc_setDefault("root", &err);   // in case user-specified locale unavailable
     err = U_ZERO_ERROR;

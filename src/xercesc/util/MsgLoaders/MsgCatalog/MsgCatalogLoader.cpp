@@ -61,24 +61,21 @@ MsgCatalogLoader::MsgCatalogLoader(const XMLCh* const msgDomain)
     
     if (nlsHome)
     {
-    	strcpy(locationBuf, nlsHome);
-        strcat(locationBuf, "/");
+        snprintf(locationBuf, sizeof(locationBuf), "%s/", nlsHome);
     }
     else
     {
         nlsHome = getenv("XERCESC_NLS_HOME");
         if (nlsHome)
         {
-            strcpy(locationBuf, nlsHome);
-            strcat(locationBuf, "/");
+            snprintf(locationBuf, sizeof(locationBuf), "%s/", nlsHome);
         }
         else
         {
             nlsHome = getenv("XERCESCROOT");
             if (nlsHome)
-            {                       	
-                strcpy(locationBuf, nlsHome);
-                strcat(locationBuf, "/msg/");
+            {
+                snprintf(locationBuf, sizeof(locationBuf), "%s/msg/", nlsHome);
             }
         }    
     }
@@ -86,15 +83,11 @@ MsgCatalogLoader::MsgCatalogLoader(const XMLCh* const msgDomain)
     // Prepare user-specified locale specific cat file
     char catuser[1024];
     memset(catuser, 0, sizeof catuser);
-    strcpy(catuser, locationBuf);
-    strcat(catuser, "XercesMessages_");
-    strcat(catuser, XMLMsgLoader::getLocale());
-    strcat(catuser, ".cat");
+    snprintf(catuser, sizeof(catuser), "%sXercesMessages_%s.cat", locationBuf, XMLMsgLoader::getLocale());
         
     char catdefault[1024];
     memset(catdefault, 0, sizeof catdefault);
-    strcpy(catdefault, locationBuf);
-    strcat(catdefault, "XercesMessages_en_US.cat");
+    snprintf(catdefault, sizeof(catdefault), "%sXercesMessages_en_US.cat", locationBuf);
 
    /**
     * To open user-specified locale specific cat file
@@ -132,7 +125,7 @@ bool MsgCatalogLoader::loadMsg(const  XMLMsgLoader::XMLMsgId  msgToLoad
                               , const XMLSize_t               maxChars)
 {
     char msgString[100];
-    sprintf(msgString, "Could not find message ID %d from message set %d\n", msgToLoad, fMsgSet);
+    snprintf(msgString, sizeof(msgString), "Could not find message ID %d from message set %d\n", msgToLoad, fMsgSet);
     char* catMessage = catgets( fCatalogHandle, fMsgSet, (int)msgToLoad, msgString);
 
     // catgets returns a pointer to msgString if it fails to locate the message
