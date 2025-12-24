@@ -137,8 +137,8 @@ void AnyURIDatatypeValidator::encode(const XMLCh* const content, const XMLSize_t
 
         if (needEscapeMap[ch])
         {
-            char tempStr[3] = "\0";
-            sprintf(tempStr, "%02X", ch);
+            char tempStr[3];
+            snprintf(tempStr, sizeof(tempStr), "%02X", ch);
             encoded.append('%');
             encoded.append((XMLCh)tempStr[0]);
             encoded.append((XMLCh)tempStr[1]);
@@ -166,8 +166,8 @@ void AnyURIDatatypeValidator::encode(const XMLCh* const content, const XMLSize_t
             XMLByte b = UTF8Byte[j];
             if (b >= 128 || needEscapeMap[b])
             {
-                char tempStr[3] = "\0";
-                sprintf(tempStr, "%02X", b);
+                char tempStr[3];
+                snprintf(tempStr, sizeof(tempStr), "%02X", b);
                 encoded.append('%');
                 encoded.append((XMLCh)tempStr[0]);
                 encoded.append((XMLCh)tempStr[1]);
