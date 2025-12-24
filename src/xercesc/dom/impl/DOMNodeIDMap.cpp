@@ -46,7 +46,7 @@ DOMNodeIDMap::DOMNodeIDMap(XMLSize_t initialSize, DOMDocument *doc)
             // We need a bigger size than the largest available one.
             //   Big trouble.
             fSizeIndex--;
-            ThrowXMLwithMemMgr(RuntimeException, XMLExcepts::NodeIDMap_GrowErr, ((DOMDocumentImpl *)fDoc)->getMemoryManager());
+            ThrowXMLwithMemMgr(RuntimeException, XMLExcepts::NodeIDMap_GrowErr, static_cast<DOMDocumentImpl*>(fDoc)->getMemoryManager());
         }
     }
 
@@ -54,17 +54,17 @@ DOMNodeIDMap::DOMNodeIDMap(XMLSize_t initialSize, DOMDocument *doc)
     fMaxEntries = (XMLSize_t)(float(fSize) * gMaxFill);
 
     //fTable = new (fDoc) DOMAttr*[fSize];
-    fTable = (DOMAttr**) ((DOMDocumentImpl *)fDoc)->allocate(sizeof(DOMAttr*) * fSize);
+    fTable = static_cast<DOMAttr**>(static_cast<DOMDocumentImpl*>(fDoc)->allocate(sizeof(DOMAttr*) * fSize));
     XMLSize_t i;
     for (i=0; i<fSize; i++)
-        fTable[i] = 0;
+        fTable[i] = nullptr;
 }
 
 
 DOMNodeIDMap::~DOMNodeIDMap()
 {
     // don't delete - the document owns the storage.
-    fTable = 0;
+    fTable = nullptr;
 }
 
 
@@ -198,17 +198,17 @@ void DOMNodeIDMap::growTable()
         // We need to grow bigger than the largest available size.
         //   Big trouble.
         fSizeIndex--;
-        ThrowXMLwithMemMgr(RuntimeException, XMLExcepts::NodeIDMap_GrowErr, ((DOMDocumentImpl *)fDoc)->getMemoryManager());
+        ThrowXMLwithMemMgr(RuntimeException, XMLExcepts::NodeIDMap_GrowErr, static_cast<DOMDocumentImpl*>(fDoc)->getMemoryManager());
     }
 
     //
     //  Allocate the new table.
     //
     //fTable = new (fDoc) DOMAttr *[fSize];
-    fTable = (DOMAttr**) ((DOMDocumentImpl *)fDoc)->allocate(sizeof(DOMAttr*) * fSize);
+    fTable = static_cast<DOMAttr**>(static_cast<DOMDocumentImpl*>(fDoc)->allocate(sizeof(DOMAttr*) * fSize));
     XMLSize_t i;
     for (i=0; i<fSize; i++)
-        fTable[i] = 0;
+        fTable[i] = nullptr;
 
     fMaxEntries = (XMLSize_t)(float(fSize) * gMaxFill);
 

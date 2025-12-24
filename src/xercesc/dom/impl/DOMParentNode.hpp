@@ -58,7 +58,7 @@ public:
     DOMNode                *fContainingNode; // the impl object that we're contained by
     DOMDocument            *fOwnerDocument; // Document this node belongs to
     DOMNode                *fFirstChild;
-    DOMNodeListImpl            fChildNodeList;      // for GetChildNodes()
+    mutable DOMNodeListImpl    fChildNodeList;      // for GetChildNodes()
 
 public:
     DOMParentNode(DOMNode* containingNode, DOMDocument *ownerDocument);

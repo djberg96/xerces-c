@@ -116,8 +116,7 @@ void DOMParentNode::setOwnerDocument(DOMDocument* doc) {
 }
 
 DOMNodeList *DOMParentNode::getChildNodes() const {
-    const DOMNodeList *ret = &fChildNodeList;
-    return (DOMNodeList *)ret;   // cast off const.
+    return &fChildNodeList;
 }
 
 
