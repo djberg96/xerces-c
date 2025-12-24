@@ -180,14 +180,14 @@ DOMDocument *DOMNodeImpl::getOwnerDocument() const
         if (!ownerDoc) {
 
             assert (fOwnerNode->getNodeType() == DOMNode::DOCUMENT_NODE);
-            return  (DOMDocument *)fOwnerNode;
+            return static_cast<DOMDocument*>(fOwnerNode);
         }
         else {
             return ownerDoc;
         }
     } else {
         assert (fOwnerNode->getNodeType() == DOMNode::DOCUMENT_NODE);
-        return  (DOMDocument *)fOwnerNode;
+        return static_cast<DOMDocument*>(fOwnerNode);
     }
 }
 
@@ -263,10 +263,10 @@ void DOMNodeImpl::setReadOnly(bool readOnl, bool deep)
             case DOMNode::ENTITY_REFERENCE_NODE:
                 break;
             case DOMNode::ELEMENT_NODE:
-                ((DOMElementImpl*) mykid)->setReadOnly(readOnl, true);
+                static_cast<DOMElementImpl*>(mykid)->setReadOnly(readOnl, true);
                 break;
             case DOMNode::DOCUMENT_TYPE_NODE:
-               ((DOMDocumentTypeImpl*) mykid)->setReadOnly(readOnl, true);
+               static_cast<DOMDocumentTypeImpl*>(mykid)->setReadOnly(readOnl, true);
                break;
             default:
                 castToNodeImpl(mykid)->setReadOnly(readOnl, true);
@@ -357,24 +357,24 @@ const XMLCh* DOMNodeImpl::mapPrefix(const XMLCh *prefix,
 void* DOMNodeImpl::setUserData(const XMLCh* key, void* data, DOMUserDataHandler* handler)
 {
    if (!data && !hasUserData())
-       return 0;
+       return nullptr;
 
     hasUserData(true);
-    return ((DOMDocumentImpl*)getOwnerDocument())->setUserData(this, key, data, handler);
+    return static_cast<DOMDocumentImpl*>(getOwnerDocument())->setUserData(this, key, data, handler);
 }
 
 void* DOMNodeImpl::getUserData(const XMLCh* key) const
 {
    if (hasUserData())
-       return ((DOMDocumentImpl*)getOwnerDocument())->getUserData(this, key);
-    return 0;
+       return static_cast<DOMDocumentImpl*>(getOwnerDocument())->getUserData(this, key);
+    return nullptr;
 }
 
 void DOMNodeImpl::callUserDataHandlers(DOMUserDataHandler::DOMOperationType operation,
                                        const DOMNode* src,
                                        DOMNode* dst) const
 {
-    DOMDocumentImpl* doc=(DOMDocumentImpl*)getOwnerDocument();
+    DOMDocumentImpl* doc = static_cast<DOMDocumentImpl*>(getOwnerDocument());
     if (doc)
         doc->callUserDataHandlers(this, operation, src, dst);
 }
@@ -621,8 +621,10 @@ const DOMNode*   DOMNodeImpl::getTreeParentNode(const DOMNode* node) const {
     case DOMNode::ATTRIBUTE_NODE: return ((const DOMAttr*)node)->getOwnerElement();
     case DOMNode::NOTATION_NODE:
     case DOMNode::ENTITY_NODE:    return node->getOwnerDocument()->getDoctype();
+    default:
+        break;
     }
-    return 0;
+    return nullptr;
 }
 
 short DOMNodeImpl::compareDocumentPosition(const DOMNode* other) const {
