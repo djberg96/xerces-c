@@ -115,10 +115,10 @@ void DOMTreeWalkerImpl::setCurrentNode (DOMNode* node) {
  */
 DOMNode* DOMTreeWalkerImpl::parentNode () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     DOMNode* node = getParentNode(fCurrentNode);
-    if (node != 0) {
+    if (node != nullptr) {
         fCurrentNode = node;
     }
     return node;
@@ -132,14 +132,14 @@ DOMNode* DOMTreeWalkerImpl::parentNode () {
  */
 DOMNode* DOMTreeWalkerImpl::firstChild () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     if(!fExpandEntityReferences && fCurrentNode->getNodeType()==DOMNode::ENTITY_REFERENCE_NODE)
-        return 0;
+        return nullptr;
 
     DOMNode* node = getFirstChild(fCurrentNode);
 
-    if (node != 0) {
+    if (node != nullptr) {
         fCurrentNode = node;
     }
     return node;
@@ -152,13 +152,13 @@ DOMNode* DOMTreeWalkerImpl::firstChild () {
  */
 DOMNode* DOMTreeWalkerImpl::lastChild () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     if(!fExpandEntityReferences && fCurrentNode->getNodeType()==DOMNode::ENTITY_REFERENCE_NODE)
-        return 0;
+        return nullptr;
 
     DOMNode* node = getLastChild(fCurrentNode);
-    if (node != 0) {
+    if (node != nullptr) {
         fCurrentNode = node;
     }
     return node;
@@ -172,10 +172,10 @@ DOMNode* DOMTreeWalkerImpl::lastChild () {
 
 DOMNode* DOMTreeWalkerImpl::previousSibling () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     DOMNode* node = getPreviousSibling(fCurrentNode);
-    if (node != 0) {
+    if (node != nullptr) {
         fCurrentNode = node;
     }
     return node;
@@ -189,10 +189,10 @@ DOMNode* DOMTreeWalkerImpl::previousSibling () {
 
 DOMNode* DOMTreeWalkerImpl::nextSibling () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     DOMNode* node = getNextSibling(fCurrentNode);
-    if (node != 0) {
+    if (node != nullptr) {
         fCurrentNode = node;
     }
     return node;
@@ -206,13 +206,13 @@ DOMNode* DOMTreeWalkerImpl::nextSibling () {
 
 DOMNode* DOMTreeWalkerImpl::previousNode () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     // get sibling
     DOMNode* node = getPreviousSibling(fCurrentNode);
-    if (node == 0) {
+    if (node == nullptr) {
         node = getParentNode(fCurrentNode);
-        if ( node != 0) {
+        if ( node != nullptr) {
             fCurrentNode = node;
         }
         return node;
@@ -223,7 +223,7 @@ DOMNode* DOMTreeWalkerImpl::previousNode () {
         DOMNode* lastChild  = getLastChild(node);
 
         // if there is a lastChild which passes filters return it.
-        if (lastChild != 0) {
+        if (lastChild != nullptr) {
             fCurrentNode = lastChild;
         }
         else {
@@ -241,11 +241,11 @@ DOMNode* DOMTreeWalkerImpl::previousNode () {
 
 DOMNode* DOMTreeWalkerImpl::nextNode () {
 
-    if (!fCurrentNode) return 0;
+    if (!fCurrentNode) return nullptr;
 
     DOMNode* node = getFirstChild(fCurrentNode);
 
-    if (node != 0) {
+    if (node != nullptr) {
         fCurrentNode = node;
         return node;
     }
@@ -253,7 +253,7 @@ DOMNode* DOMTreeWalkerImpl::nextNode () {
 
         node = getNextSibling(fCurrentNode);
 
-        if (node != 0) {
+        if (node != nullptr) {
             fCurrentNode = node;
             return node;
         }
@@ -261,9 +261,9 @@ DOMNode* DOMTreeWalkerImpl::nextNode () {
 
             // return parent's 1st sibling.
             DOMNode* parent = getParentNode(fCurrentNode);
-            while ( parent != 0) {
+            while ( parent != nullptr) {
                 node = getNextSibling(parent);
-                if (node != 0) {
+                if (node != nullptr) {
                     fCurrentNode = node;
                     return node;
                 } else {
@@ -284,10 +284,10 @@ DOMNode* DOMTreeWalkerImpl::nextNode () {
 
 DOMNode* DOMTreeWalkerImpl::getParentNode (DOMNode* node) {
 
-    if (!node || node == fRoot) return 0;
+    if (!node || node == fRoot) return nullptr;
 
     DOMNode* newNode = node->getParentNode();
-    if (!newNode)  return 0;
+    if (!newNode)  return nullptr;
 
     short accept = acceptNode(newNode);
 
@@ -307,14 +307,14 @@ DOMNode* DOMTreeWalkerImpl::getParentNode (DOMNode* node) {
 
 DOMNode* DOMTreeWalkerImpl::getNextSibling (DOMNode* node) {
 
-    if (!node || node == fRoot) return 0;
+    if (!node || node == fRoot) return nullptr;
 
     DOMNode* newNode = node->getNextSibling();
     if (!newNode) {
 
         newNode = node->getParentNode();
 
-        if (!newNode || node == fRoot)  return 0;
+        if (!newNode || node == fRoot)  return nullptr;
 
         short parentAccept = acceptNode(newNode);
 
@@ -322,7 +322,7 @@ DOMNode* DOMTreeWalkerImpl::getNextSibling (DOMNode* node) {
             return getNextSibling(newNode);
         }
 
-        return 0;
+        return nullptr;
     }
 
     short accept = acceptNode(newNode);
@@ -350,13 +350,13 @@ DOMNode* DOMTreeWalkerImpl::getNextSibling (DOMNode* node) {
 
 DOMNode* DOMTreeWalkerImpl::getPreviousSibling (DOMNode* node) {
 
-    if (!node || node == fRoot) return 0;
+    if (!node || node == fRoot) return nullptr;
 
     DOMNode* newNode = node->getPreviousSibling();
     if (!newNode) {
 
         newNode = node->getParentNode();
-        if (!newNode || node == fRoot)  return 0;
+        if (!newNode || node == fRoot)  return nullptr;
 
         short parentAccept = acceptNode(newNode);
 
@@ -364,7 +364,7 @@ DOMNode* DOMTreeWalkerImpl::getPreviousSibling (DOMNode* node) {
             return getPreviousSibling(newNode);
         }
 
-        return 0;
+        return nullptr;
     }
 
     short accept = acceptNode(newNode);
@@ -392,13 +392,13 @@ DOMNode* DOMTreeWalkerImpl::getPreviousSibling (DOMNode* node) {
 
 DOMNode* DOMTreeWalkerImpl::getFirstChild (DOMNode* node) {
 
-    if (!node) return 0;
+    if (!node) return nullptr;
 
     if(!fExpandEntityReferences && node->getNodeType()==DOMNode::ENTITY_REFERENCE_NODE)
-        return 0;
+        return nullptr;
 
     DOMNode* newNode = node->getFirstChild();
-    if (!newNode)  return 0;
+    if (!newNode)  return nullptr;
 
     short accept = acceptNode(newNode);
 
@@ -423,13 +423,13 @@ DOMNode* DOMTreeWalkerImpl::getFirstChild (DOMNode* node) {
 
 DOMNode* DOMTreeWalkerImpl::getLastChild (DOMNode* node) {
 
-    if (!node) return 0;
+    if (!node) return nullptr;
 
     if(!fExpandEntityReferences && node->getNodeType()==DOMNode::ENTITY_REFERENCE_NODE)
-        return 0;
+        return nullptr;
 
     DOMNode* newNode = node->getLastChild();
-    if (!newNode)  return 0;
+    if (!newNode)  return nullptr;
 
     short accept = acceptNode(newNode);
 
@@ -450,7 +450,7 @@ DOMNode* DOMTreeWalkerImpl::getLastChild (DOMNode* node) {
 
 short DOMTreeWalkerImpl::acceptNode (DOMNode* node) {
 
-    if (fNodeFilter == 0) {
+    if (fNodeFilter == nullptr) {
         if ( ( fWhatToShow & (1 << (node->getNodeType() - 1))) != 0)
         {
             return DOMNodeFilter::FILTER_ACCEPT;
