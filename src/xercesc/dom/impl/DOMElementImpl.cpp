@@ -696,7 +696,7 @@ DOMElement * DOMElementImpl::getFirstElementChild() const
             case DOMNode::ENTITY_REFERENCE_NODE:
                 {
                     DOMElement* e = getFirstElementChild(n);
-                    if (e != NULL)
+                    if (e != nullptr)
                         return e;
                 }
                 break;
@@ -718,7 +718,7 @@ DOMElement * DOMElementImpl::getLastElementChild() const
             case DOMNode::ENTITY_REFERENCE_NODE:
                 {
                     DOMElement* e = getLastElementChild(n);
-                    if (e != NULL)
+                    if (e != nullptr)
                         return e;
                 }
                 break;
