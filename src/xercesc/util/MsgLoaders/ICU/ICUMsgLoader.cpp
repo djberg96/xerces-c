@@ -158,7 +158,8 @@ ICUMsgLoader::ICUMsgLoader(const XMLCh* const  msgDomain)
     ***/
     size_t currentLen = strlen(locationBuf);
     size_t bundleNameLen = strlen(BUNDLE_NAME);
-    if (currentLen + bundleNameLen < sizeof(locationBuf)) {
+    // Check if buffer has enough space for bundle name plus null terminator
+    if (currentLen + bundleNameLen + 1 <= sizeof(locationBuf)) {
         snprintf(locationBuf + currentLen, sizeof(locationBuf) - currentLen, "%s", BUNDLE_NAME);
     } else {
         // Buffer would overflow, just use the bundle name alone
