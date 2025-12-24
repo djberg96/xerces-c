@@ -46,7 +46,7 @@ DOMNodeIteratorImpl::DOMNodeIteratorImpl (DOMDocument* doc,
     fNodeFilter(nodeFilter),
     fExpandEntityReferences(expandEntityRef),
     fDetached(false),
-    fCurrentNode(0),
+    fCurrentNode(nullptr),
     fForward(true)
 {
 
@@ -131,7 +131,7 @@ DOMNode* DOMNodeIteratorImpl::nextNode () {
 
     // if root is 0 there is no next node->
     if (!fRoot)
-			return 0;
+			return nullptr;
 
     DOMNode* aNextNode = fCurrentNode;
     bool accepted = false; // the next node has not been accepted.
@@ -139,7 +139,7 @@ DOMNode* DOMNodeIteratorImpl::nextNode () {
     while (!accepted) {
 
         // if last direction is not forward, repeat node->
-        if (!fForward && (aNextNode != 0)) {
+        if (!fForward && (aNextNode != nullptr)) {
             //System.out.println("nextNode():!fForward:"+fCurrentNode.getNodeName());
             aNextNode = fCurrentNode;
         } else {
@@ -150,7 +150,7 @@ DOMNode* DOMNodeIteratorImpl::nextNode () {
         fForward = true; //REVIST: should direction be set forward before 0 check?
 
         // nothing in the list. return 0.
-        if (!aNextNode) return 0;
+        if (!aNextNode) return nullptr;
 
         // does node pass the filters and whatToShow?
         accepted = acceptNode(aNextNode);
@@ -162,7 +162,7 @@ DOMNode* DOMNodeIteratorImpl::nextNode () {
     }
 
     // no nodes, or no accepted nodes.
-    return 0;
+    return nullptr;
 }
 
 
@@ -175,14 +175,14 @@ DOMNode* DOMNodeIteratorImpl::previousNode () {
 		throw DOMException(DOMException::INVALID_STATE_ERR, 0, GetDOMNodeIteratorMemoryManager);
 
     // if the root is 0, or the current node is 0, return 0.
-    if (!fRoot || !fCurrentNode) return 0;
+    if (!fRoot || !fCurrentNode) return nullptr;
 
     DOMNode* aPreviousNode = fCurrentNode;
     bool accepted = false;
 
     while (!accepted) {
 
-        if (fForward && (aPreviousNode != 0)) {
+        if (fForward && (aPreviousNode != nullptr)) {
             //repeat last node->
             aPreviousNode = fCurrentNode;
         } else {
@@ -195,7 +195,7 @@ DOMNode* DOMNodeIteratorImpl::previousNode () {
 
         // if the new previous node is 0, we're at head or past the root,
         // so return 0.
-        if (!aPreviousNode) return 0;
+        if (!aPreviousNode) return nullptr;
 
         // check if node passes filters and whatToShow.
         accepted = acceptNode(aPreviousNode);
@@ -206,7 +206,7 @@ DOMNode* DOMNodeIteratorImpl::previousNode () {
         }
     }
     // there are no nodes?
-    return 0;
+    return nullptr;
 }
 
 
@@ -215,7 +215,7 @@ bool DOMNodeIteratorImpl::acceptNode (DOMNode* node) {
 	if (fDetached)
 		throw DOMException(DOMException::INVALID_STATE_ERR, 0, GetDOMNodeIteratorMemoryManager);
 
-    if (fNodeFilter == 0) {
+    if (fNodeFilter == nullptr) {
         return ((fWhatToShow & (1 << (node->getNodeType() - 1))) != 0);
     } else {
         return ((fWhatToShow & (1 << (node->getNodeType() - 1))) != 0)
@@ -231,7 +231,7 @@ DOMNode* DOMNodeIteratorImpl::matchNodeOrParent (DOMNode* node) {
         if (node == n) return n;
     }
 
-    return 0;
+    return nullptr;
 }
 
 
@@ -248,7 +248,7 @@ DOMNode* DOMNodeIteratorImpl::nextNode (DOMNode* node, bool visitChildren) {
 
     if (!node) return fRoot;
 
-    DOMNode* result = 0;
+    DOMNode* result = nullptr;
     // only check children if we visit children.
     if (visitChildren) {
         //if hasChildren, return 1st child.
@@ -262,23 +262,23 @@ DOMNode* DOMNodeIteratorImpl::nextNode (DOMNode* node, bool visitChildren) {
     // if hasSibling, return sibling
     if (node != fRoot) {
         result = node->getNextSibling();
-        if (result != 0) return result;
+        if (result != nullptr) return result;
 
 
         // return parent's 1st sibling.
         DOMNode* parent = node->getParentNode();
-        while ((parent != 0) && parent != fRoot) {
+        while ((parent != nullptr) && parent != fRoot) {
             result = parent->getNextSibling();
-            if (result != 0) {
+            if (result != nullptr) {
                 return result;
             } else {
                 parent = parent->getParentNode();
             }
 
-        } // while (parent != 0 && parent != fRoot) {
+        } // while (parent != nullptr && parent != fRoot) {
     }
     // end of list, return 0
-    return 0;
+    return nullptr;
 }
 
 
@@ -290,11 +290,11 @@ DOMNode* DOMNodeIteratorImpl::previousNode (DOMNode* node) {
 	if (fDetached)
 		throw DOMException(DOMException::INVALID_STATE_ERR, 0, GetDOMNodeIteratorMemoryManager);
 
-    DOMNode* result = 0;
+    DOMNode* result = nullptr;
 
     // if we're at the root, return 0.
     if (node == fRoot)
-			return 0;
+			return nullptr;
 
     // get sibling
     result = node->getPreviousSibling();
@@ -339,7 +339,7 @@ void DOMNodeIteratorImpl::removeNode (DOMNode* node) {
     // if (!fForward)
     {
         DOMNode* next = nextNode(deleted, false);
-        if (next != 0) {
+        if (next != nullptr) {
             // normal case: there _are_ nodes following this in the iterator.
             fCurrentNode = next;
         } else {

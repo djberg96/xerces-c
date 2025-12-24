@@ -103,14 +103,14 @@ DOMText *DOMTextImpl::splitText(XMLSize_t offset)
       this->substringData(offset, len - offset));
 
     DOMNode *parent = getParentNode();
-    if (parent != 0)
+    if (parent != nullptr)
         parent->insertBefore(newText, getNextSibling());
 
     fCharacterData.fDataBuf->chop(offset);
 
-    if (doc != 0) {
+    if (doc != nullptr) {
         Ranges* ranges = doc->getRanges();
-        if (ranges != 0) {
+        if (ranges != nullptr) {
             XMLSize_t sz = ranges->size();
             if (sz != 0) {
                 for (XMLSize_t i =0; i<sz; i++) {
@@ -147,22 +147,22 @@ const XMLCh* DOMTextImpl::getWholeText() const
     DOMDocument *doc = getOwnerDocument();
     if (!doc) {
         throw DOMException(DOMException::NOT_SUPPORTED_ERR, 0, GetDOMNodeMemoryManager);
-        return 0;
+        return nullptr;
     }
     DOMNode* root=doc->getDocumentElement();
-    DOMTreeWalker* pWalker=doc->createTreeWalker(root!=NULL?root:(DOMNode*)this, DOMNodeFilter::SHOW_ALL, NULL, true);
+    DOMTreeWalker* pWalker=doc->createTreeWalker(root!=nullptr?root:(DOMNode*)this, DOMNodeFilter::SHOW_ALL, nullptr, true);
     pWalker->setCurrentNode((DOMNode*)this);
     // Logically-adjacent text nodes are Text or CDATASection nodes that can be visited sequentially in document order or in
     // reversed document order without entering, exiting, or passing over Element, Comment, or ProcessingInstruction nodes.
     DOMNode* prevNode;
-    while((prevNode=pWalker->previousNode())!=NULL)
+    while((prevNode=pWalker->previousNode())!=nullptr)
     {
         if(prevNode->getNodeType()==ELEMENT_NODE || prevNode->getNodeType()==COMMENT_NODE || prevNode->getNodeType()==PROCESSING_INSTRUCTION_NODE)
             break;
     }
     XMLBuffer buff(1023, GetDOMNodeMemoryManager);
     DOMNode* nextNode;
-    while((nextNode=pWalker->nextNode())!=NULL)
+    while((nextNode=pWalker->nextNode())!=nullptr)
     {
         if(nextNode->getNodeType()==ELEMENT_NODE || nextNode->getNodeType()==COMMENT_NODE || nextNode->getNodeType()==PROCESSING_INSTRUCTION_NODE)
             break;
@@ -179,13 +179,13 @@ const XMLCh* DOMTextImpl::getWholeText() const
 DOMText* DOMTextImpl::replaceWholeText(const XMLCh* newText)
 {
     DOMDocument *doc = getOwnerDocument();
-    DOMTreeWalker* pWalker=doc->createTreeWalker(doc->getDocumentElement(), DOMNodeFilter::SHOW_ALL, NULL, true);
+    DOMTreeWalker* pWalker=doc->createTreeWalker(doc->getDocumentElement(), DOMNodeFilter::SHOW_ALL, nullptr, true);
     pWalker->setCurrentNode((DOMNode*)this);
     // Logically-adjacent text nodes are Text or CDATASection nodes that can be visited sequentially in document order or in
     // reversed document order without entering, exiting, or passing over Element, Comment, or ProcessingInstruction nodes.
     DOMNode* pFirstTextNode=this;
     DOMNode* prevNode;
-    while((prevNode=pWalker->previousNode())!=NULL)
+    while((prevNode=pWalker->previousNode())!=nullptr)
     {
         if(prevNode->getNodeType()==ELEMENT_NODE || prevNode->getNodeType()==COMMENT_NODE || prevNode->getNodeType()==PROCESSING_INSTRUCTION_NODE)
             break;
@@ -194,13 +194,13 @@ DOMText* DOMTextImpl::replaceWholeText(const XMLCh* newText)
     // before doing any change we need to check if we are going to remove an entity reference that doesn't contain just text
     DOMNode* pCurrentNode=pWalker->getCurrentNode();
     DOMNode* nextNode;
-    while((nextNode=pWalker->nextNode())!=NULL)
+    while((nextNode=pWalker->nextNode())!=nullptr)
     {
         if(nextNode->getNodeType()==ELEMENT_NODE || nextNode->getNodeType()==COMMENT_NODE || nextNode->getNodeType()==PROCESSING_INSTRUCTION_NODE)
             break;
         if(nextNode->getNodeType()==ENTITY_REFERENCE_NODE)
         {
-            DOMTreeWalker* pInnerWalker=doc->createTreeWalker(nextNode, DOMNodeFilter::SHOW_ALL, NULL, true);
+            DOMTreeWalker* pInnerWalker=doc->createTreeWalker(nextNode, DOMNodeFilter::SHOW_ALL, nullptr, true);
             while(pInnerWalker->nextNode())
             {
                 short nodeType=pInnerWalker->getCurrentNode()->getNodeType();
@@ -210,7 +210,7 @@ DOMText* DOMTextImpl::replaceWholeText(const XMLCh* newText)
             pInnerWalker->release();
         }
     }
-    DOMText* retVal=NULL;
+    DOMText* retVal=nullptr;
     // if the first node in the chain is a text node, replace its content, otherwise create a new node
     if(newText && *newText)
     {
@@ -230,7 +230,7 @@ DOMText* DOMTextImpl::replaceWholeText(const XMLCh* newText)
     }
     // now delete all the following text nodes
     pWalker->setCurrentNode(pCurrentNode);
-    while((nextNode=pWalker->nextNode())!=NULL)
+    while((nextNode=pWalker->nextNode())!=nullptr)
     {
         if(nextNode->getNodeType()==ELEMENT_NODE || nextNode->getNodeType()==COMMENT_NODE || nextNode->getNodeType()==PROCESSING_INSTRUCTION_NODE)
             break;

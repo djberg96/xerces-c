@@ -32,7 +32,7 @@
 namespace XERCES_CPP_NAMESPACE {
 
 DOMParentNode::DOMParentNode(DOMNode* containingNode, DOMDocument *ownerDoc)
-    : fContainingNode(containingNode), fOwnerDocument(ownerDoc), fFirstChild(0), fChildNodeList(this)
+    : fContainingNode(containingNode), fOwnerDocument(ownerDoc), fFirstChild(nullptr), fChildNodeList(this)
 {
     if (!fContainingNode) {
         throw DOMException(DOMException::INVALID_STATE_ERR, 0, GetDOMNodeMemoryManager);
@@ -51,7 +51,7 @@ DOMParentNode::DOMParentNode(DOMNode* containingNode, const DOMParentNode &other
     this->fOwnerDocument = other.fOwnerDocument;
 
     // Need to break the association w/ original kids
-    this->fFirstChild = 0;
+    this->fFirstChild = nullptr;
 }
 
 DOMParentNode::~DOMParentNode() {
@@ -95,7 +95,7 @@ DOMNode * DOMParentNode::appendChild(DOMNode *newChild)
 void DOMParentNode::cloneChildren(const DOMNode *other) {
   //    for (DOMNode *mykid = other.getFirstChild();
     for (DOMNode *mykid = other->getFirstChild();
-         mykid != 0;
+         mykid != nullptr;
          mykid = mykid->getNextSibling())
     {
         appendChild(mykid->cloneNode(true));
@@ -134,8 +134,8 @@ DOMNode * DOMParentNode::getLastChild() const
 DOMNode * DOMParentNode::lastChild() const
 {
     // last child is stored as the previous sibling of first child
-    if (fFirstChild == 0) {
-        return 0;
+    if (fFirstChild == nullptr) {
+        return nullptr;
     }
 
     DOMChildNode *firstChild = castToChildImpl(fFirstChild);
@@ -149,7 +149,7 @@ DOMNode * DOMParentNode::lastChild() const
 //
 void DOMParentNode::lastChild(DOMNode *node) {
     // store lastChild as previous sibling of first child
-    if (fFirstChild != 0) {
+    if (fFirstChild != nullptr) {
         DOMChildNode *firstChild = castToChildImpl(fFirstChild);
         firstChild->previousSibling = node;
     }
@@ -158,15 +158,15 @@ void DOMParentNode::lastChild(DOMNode *node) {
 
 bool DOMParentNode::hasChildNodes() const
 {
-    return fFirstChild!=0;
+    return fFirstChild!=nullptr;
 }
 
 
 
 DOMNode *DOMParentNode::insertBefore(DOMNode *newChild, DOMNode *refChild) {
     //not really in the specs, but better than nothing
-    if(newChild==NULL)
-        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR,0, GetDOMParentNodeMemoryManager);
+    if(newChild==nullptr)
+        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR, 0, GetDOMParentNodeMemoryManager);
 
     const DOMNodeImpl *thisNodeImpl = getContainingNodeImpl();
     if (thisNodeImpl->isReadOnly())
@@ -180,20 +180,20 @@ DOMNode *DOMParentNode::insertBefore(DOMNode *newChild, DOMNode *refChild) {
     if(newChild->hasChildNodes()) {
         bool treeSafe=true;
         for(DOMNode *a=getContainingNode()->getParentNode();
-            treeSafe && a!=0;
+            treeSafe && a!=nullptr;
             a=a->getParentNode())
             treeSafe=(newChild!=a);
         if(!treeSafe)
-            throw DOMException(DOMException::HIERARCHY_REQUEST_ERR,0, GetDOMParentNodeMemoryManager);
+            throw DOMException(DOMException::HIERARCHY_REQUEST_ERR, 0, GetDOMParentNodeMemoryManager);
     }
 
     // refChild must in fact be a child of this node (or 0)
-    if (refChild!=0 && refChild->getParentNode() != getContainingNode())
-        throw DOMException(DOMException::NOT_FOUND_ERR,0, GetDOMParentNodeMemoryManager);
+    if (refChild!=nullptr && refChild->getParentNode() != getContainingNode())
+        throw DOMException(DOMException::NOT_FOUND_ERR, 0, GetDOMParentNodeMemoryManager);
 
     // if the new node has to be placed before itself, we don't have to do anything
     // (even worse, we would crash if we continue, as we assume they are two distinct nodes)
-    if (refChild!=0 && newChild->isSameNode(refChild))
+    if (refChild!=nullptr && newChild->isSameNode(refChild))
         return newChild;
 
     if (newChild->getNodeType() == DOMNode::DOCUMENT_FRAGMENT_NODE)
@@ -216,23 +216,23 @@ DOMNode *DOMParentNode::insertBefore(DOMNode *newChild, DOMNode *refChild) {
         // No need to check kids for right-document; if they weren't,
         // they wouldn't be kids of that DocFrag.
         for(DOMNode *kid=newChild->getFirstChild(); // Prescan
-              kid!=0;
+              kid!=nullptr;
               kid=kid->getNextSibling())
         {
             if (!DOMDocumentImpl::isKidOK(getContainingNode(), kid))
-              throw DOMException(DOMException::HIERARCHY_REQUEST_ERR,0, GetDOMParentNodeMemoryManager);
+              throw DOMException(DOMException::HIERARCHY_REQUEST_ERR, 0, GetDOMParentNodeMemoryManager);
         }
         while(newChild->hasChildNodes())     // Move
             getContainingNode()->insertBefore(newChild->getFirstChild(),refChild);
     }
 
     else if (!DOMDocumentImpl::isKidOK(getContainingNode(), newChild))
-        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR,0, GetDOMParentNodeMemoryManager);
+        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR, 0, GetDOMParentNodeMemoryManager);
 
     else
     {
         DOMNode *oldparent=newChild->getParentNode();
-        if(oldparent!=0)
+        if(oldparent!=nullptr)
             oldparent->removeChild(newChild);
 
         // Attach up
@@ -241,7 +241,7 @@ DOMNode *DOMParentNode::insertBefore(DOMNode *newChild, DOMNode *refChild) {
 
         // Attach before and after
         // Note: fFirstChild.previousSibling == lastChild!!
-        if (fFirstChild == 0) {
+        if (fFirstChild == nullptr) {
             // this our first and only child
             fFirstChild = newChild;
             castToNodeImpl(newChild)->isFirstChild(true);
@@ -249,7 +249,7 @@ DOMNode *DOMParentNode::insertBefore(DOMNode *newChild, DOMNode *refChild) {
             DOMChildNode *newChild_ci = castToChildImpl(newChild);
             newChild_ci->previousSibling = newChild;
         } else {
-            if (refChild == 0) {
+            if (refChild == nullptr) {
                 // this is an append
                 DOMNode *lastChild = castToChildImpl(fFirstChild)->previousSibling;
                 castToChildImpl(lastChild)->nextSibling = newChild;
@@ -279,9 +279,9 @@ DOMNode *DOMParentNode::insertBefore(DOMNode *newChild, DOMNode *refChild) {
 
     changed();
 
-    if (fOwnerDocument != 0) {
+    if (fOwnerDocument != nullptr) {
         Ranges* ranges = ((DOMDocumentImpl*)fOwnerDocument)->getRanges();
-        if ( ranges != 0) {
+        if ( ranges != nullptr) {
             XMLSize_t sz = ranges->size();
             if (sz != 0) {
                 for (XMLSize_t i =0; i<sz; i++) {

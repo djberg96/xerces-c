@@ -60,17 +60,17 @@ const unsigned short DOMNodeImpl::TOBERELEASED = 0x1<<12;
 
 //
 //
-static DOMNodeListImpl *gEmptyNodeList = 0; // Singleton empty node list.
+static DOMNodeListImpl *gEmptyNodeList = nullptr; // Singleton empty node list.
 
 void XMLInitializer::initializeDOMNodeListImpl()
 {
-    gEmptyNodeList = new DOMNodeListImpl(0);
+    gEmptyNodeList = new DOMNodeListImpl(nullptr);
 }
 
 void XMLInitializer::terminateDOMNodeListImpl()
 {
     delete gEmptyNodeList;
-    gEmptyNodeList = 0;
+    gEmptyNodeList = nullptr;
 }
 
 // -----------------------------------------------------------------------
@@ -82,7 +82,7 @@ DOMNodeImpl::DOMNodeImpl(DOMNode* containingNode, DOMNode *ownerNode)
     if (!fContainingNode) {
         throw DOMException(DOMException::INVALID_STATE_ERR, 0, GetDOMNodeMemoryManager);
     }
-    
+
     this->flags = 0;
     // as long as we do not have any owner, fOwnerNode is our ownerDocument
 }
@@ -121,14 +121,14 @@ DOMNode * DOMNodeImpl::appendChild(DOMNode *)
 {
     // Only node types that don't allow children will use this default function.
     //   Others will go to DOMParentNode::appendChild.
-    throw DOMException(DOMException::HIERARCHY_REQUEST_ERR,0, GetDOMNodeMemoryManager);
-    return 0;
+    throw DOMException(DOMException::HIERARCHY_REQUEST_ERR, 0, GetDOMNodeMemoryManager);
+    return nullptr;
     //  return insertBefore(newChild, 0);
 }
 
 
 DOMNamedNodeMap * DOMNodeImpl::getAttributes() const {
-    return 0;                   // overridden in ElementImpl
+    return nullptr;                   // overridden in ElementImpl
 }
 
 
@@ -139,23 +139,23 @@ DOMNodeList *DOMNodeImpl::getChildNodes() const {
 
 
 DOMNode * DOMNodeImpl::getFirstChild() const {
-    return 0;                   // overridden in ParentNode
+    return nullptr;                   // overridden in ParentNode
 }
 
 
 DOMNode * DOMNodeImpl::getLastChild() const
 {
-    return 0;                   // overridden in ParentNode
+    return nullptr;                   // overridden in ParentNode
 }
 
 
 DOMNode * DOMNodeImpl::getNextSibling() const {
-    return 0;                // overridden in ChildNode
+    return nullptr;                // overridden in ChildNode
 }
 
 
 const XMLCh * DOMNodeImpl::getNodeValue() const {
-    return 0;                    // Overridden by anything that has a value
+    return nullptr;                    // Overridden by anything that has a value
 }
 
 
@@ -169,7 +169,7 @@ DOMDocument *DOMNodeImpl::getOwnerDocument() const
     {
         const DOMNode *ep = getContainingNode();
         const DOMParentNode* parent = castToParentImpl(getContainingNode());
-        return parent ? parent->fOwnerDocument : 0;
+        return parent ? parent->fOwnerDocument : nullptr;
     }
 
     //  Leaf node types - those that cannot have children, like Text.

@@ -31,7 +31,7 @@
 namespace XERCES_CPP_NAMESPACE {
 
 DOMAttrImpl::DOMAttrImpl(DOMDocument *ownerDoc, const XMLCh *aName)
-    : fNode(this, ownerDoc), fParent(this, ownerDoc), fSchemaType(0)
+    : fNode(this, ownerDoc), fParent(this, ownerDoc), fSchemaType(nullptr)
 {
     DOMDocumentImpl *docImpl = (DOMDocumentImpl *)ownerDoc;
     fName = docImpl->getPooledString(aName);
@@ -103,13 +103,13 @@ bool DOMAttrImpl::getSpecified() const
 
 const XMLCh * DOMAttrImpl::getValue() const
 {
-    if (fParent.fFirstChild == 0) {
+    if (fParent.fFirstChild == nullptr) {
         return XMLUni::fgZeroLenString; // return "";
     }
 
     // Simple case where attribute value is just a single text node
     DOMNode *node = castToChildImpl(fParent.fFirstChild)->nextSibling;
-    if (node == 0 && fParent.fFirstChild->getNodeType() == DOMNode::TEXT_NODE) {
+    if (node == nullptr && fParent.fFirstChild->getNodeType() == DOMNode::TEXT_NODE) {
         return fParent.fFirstChild->getNodeValue();
     }
 
@@ -127,7 +127,7 @@ const XMLCh * DOMAttrImpl::getValue() const
     DOMDocumentImpl* doc = (DOMDocumentImpl*)fParent.fOwnerDocument;
 
     XMLBuffer buf(1023, doc->getMemoryManager());
-    for (node = fParent.fFirstChild; node != 0; node = castToChildImpl(node)->nextSibling)
+    for (node = fParent.fFirstChild; node != nullptr; node = castToChildImpl(node)->nextSibling)
         getTextValue(node, buf);
 
     return doc->getPooledString(buf.getRawBuffer());
@@ -139,7 +139,7 @@ void DOMAttrImpl::getTextValue(DOMNode* node, XMLBuffer& buf) const
         buf.append(node->getNodeValue());
     else if (node->getNodeType() == DOMNode::ENTITY_REFERENCE_NODE)
     {
-        for (node = node->getFirstChild(); node != 0; node = castToChildImpl(node)->nextSibling)
+        for (node = node->getFirstChild(); node != nullptr; node = castToChildImpl(node)->nextSibling)
         {
             getTextValue(node, buf);
         }
@@ -179,14 +179,14 @@ void DOMAttrImpl::setValue(const XMLCh *val)
         doc->getNodeIDMap()->remove(this);
 
     DOMNode *kid;
-    while ((kid = fParent.fFirstChild) != 0)         // Remove existing kids
+    while ((kid = fParent.fFirstChild) != nullptr)         // Remove existing kids
     {
         DOMNode* node = removeChild(kid);
         if (node)
             node->release();
     }
 
-    if (val != 0)              // Create and add the new one
+    if (val != nullptr)              // Create and add the new one
         fParent.appendChildFast(doc->createTextNode(val));
     fNode.isSpecified(true);
     fParent.changed();

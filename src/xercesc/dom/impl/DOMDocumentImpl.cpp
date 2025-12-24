@@ -81,9 +81,9 @@ void XMLInitializer::initializeDOMHeap (XMLSize_t initialHeapAllocSize,
 DOMDocumentImpl::DOMDocumentImpl(DOMImplementation* domImpl, MemoryManager* const manager)
     : fNode(this, this),
       fParent(this, this),
-      fNodeIDMap(0),
-      fInputEncoding(0),
-      fXmlEncoding(0),
+      fNodeIDMap(nullptr),
+      fInputEncoding(nullptr),
+      fXmlEncoding(nullptr),
       fXmlStandalone(false),
       fXmlVersion(0),
       fDocumentURI(0),
@@ -112,7 +112,7 @@ DOMDocumentImpl::DOMDocumentImpl(DOMImplementation* domImpl, MemoryManager* cons
     fNameTable = (DOMStringPoolEntry**)allocate (
       sizeof (DOMStringPoolEntry*) * fNameTableSize);
     for (XMLSize_t i = 0; i < fNameTableSize; i++)
-      fNameTable[i] = 0;
+      fNameTable[i] = nullptr;
 }
 
 
@@ -124,9 +124,9 @@ DOMDocumentImpl::DOMDocumentImpl(const XMLCh *fNamespaceURI,
                                MemoryManager* const manager)
     : fNode(this, this),
       fParent(this, this),
-      fNodeIDMap(0),
-      fInputEncoding(0),
-      fXmlEncoding(0),
+      fNodeIDMap(nullptr),
+      fInputEncoding(nullptr),
+      fXmlEncoding(nullptr),
       fXmlStandalone(false),
       fXmlVersion(0),
       fDocumentURI(0),
@@ -275,7 +275,7 @@ DOMNode::NodeType DOMDocumentImpl::getNodeType() const {
 // even though ownerDocument refers to this in this implementation
 // the DOM Level 2 spec says it must be 0, so make it appear so
 DOMDocument * DOMDocumentImpl::getOwnerDocument() const {
-    return 0;
+    return nullptr;
 }
 
 
@@ -437,7 +437,7 @@ NodeIterators* DOMDocumentImpl::getNodeIterators() const
 
 void DOMDocumentImpl::removeNodeIterator(DOMNodeIteratorImpl* nodeIterator)
 {
-    if (fNodeIterators != 0) {
+    if (fNodeIterators != nullptr) {
         XMLSize_t sz = fNodeIterators->size();
         if (sz !=0) {
             for (XMLSize_t i =0; i<sz; i++) {
@@ -483,7 +483,7 @@ DOMTreeWalker* DOMDocumentImpl::createTreeWalker (
 {
     if (!root) {
         throw DOMException(DOMException::NOT_SUPPORTED_ERR, 0, getMemoryManager());
-        return 0;
+        return nullptr;
     }
 
     return new (this) DOMTreeWalkerImpl(root, whatToShow, filter, entityReferenceExpansion);
@@ -523,11 +523,11 @@ DOMNode *DOMDocumentImpl::insertBefore(DOMNode *newChild, DOMNode *refChild)
 {
     // Only one such child permitted
     if(
-        (newChild->getNodeType() == DOMNode::ELEMENT_NODE  && fDocElement!=0)
+        (newChild->getNodeType() == DOMNode::ELEMENT_NODE  && fDocElement!=nullptr)
         ||
-        (newChild->getNodeType() == DOMNode::DOCUMENT_TYPE_NODE  && fDocType!=0)
+        (newChild->getNodeType() == DOMNode::DOCUMENT_TYPE_NODE  && fDocType!=nullptr)
         )
-        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR,0, getMemoryManager());
+        throw DOMException(DOMException::HIERARCHY_REQUEST_ERR, 0, getMemoryManager());
 
     // if the newChild is a documenttype node created from domimplementation, set the ownerDoc first
     if ((newChild->getNodeType() == DOMNode::DOCUMENT_TYPE_NODE) && !newChild->getOwnerDocument())
@@ -550,9 +550,9 @@ DOMNode* DOMDocumentImpl::replaceChild(DOMNode *newChild, DOMNode *oldChild) {
     DOMElement* tempDocElement = fDocElement;
 
     if(oldChild->getNodeType() == DOMNode::DOCUMENT_TYPE_NODE)
-        fDocType=0;
+        fDocType=nullptr;
     else if(oldChild->getNodeType() == DOMNode::ELEMENT_NODE)
-        fDocElement=0;
+        fDocElement=nullptr;
 
     try {
         insertBefore(newChild, oldChild);
@@ -593,9 +593,9 @@ DOMNode *DOMDocumentImpl::removeChild(DOMNode *oldChild)
 
     // If remove succeeded, un-cache the kid appropriately
     if(oldChild->getNodeType() == DOMNode::ELEMENT_NODE)
-        fDocElement=0;
+        fDocElement=nullptr;
     else if(oldChild->getNodeType() == DOMNode::DOCUMENT_TYPE_NODE)
-        fDocType=0;
+        fDocType=nullptr;
 
     return oldChild;
 }
@@ -655,12 +655,12 @@ DOMNodeList *DOMDocumentImpl::getElementsByTagNameNS(const XMLCh *fNamespaceURI,
 
 DOMElement *DOMDocumentImpl::getElementById(const XMLCh *elementId) const
 {
-    if (fNodeIDMap == 0)
-        return 0;
+    if (fNodeIDMap == nullptr)
+        return nullptr;
 
     DOMAttr *theAttr = fNodeIDMap->find(elementId);
-    if (theAttr == 0)
-        return 0;
+    if (theAttr == nullptr)
+        return nullptr;
 
     return theAttr->getOwnerElement();
 }
@@ -690,7 +690,7 @@ Ranges* DOMDocumentImpl::getRanges() const
 
 void DOMDocumentImpl::removeRange(DOMRangeImpl* range)
 {
-    if (fRanges != 0) {
+    if (fRanges != nullptr) {
         XMLSize_t sz = fRanges->size();
         if (sz !=0) {
             for (XMLSize_t i =0; i<sz; i++) {
