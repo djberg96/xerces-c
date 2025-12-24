@@ -712,7 +712,8 @@ DOMDocumentFragment* DOMRangeImpl::extractContents()
 DOMDocumentFragment* DOMRangeImpl::cloneContents() const
 {
     // cloneContents doesn't modify the range state, just the cast
-    return const_cast<DOMRangeImpl*>(this)->traverseContents(CLONE_CONTENTS);\n}
+    return const_cast<DOMRangeImpl*>(this)->traverseContents(CLONE_CONTENTS);
+}
 
 
 void DOMRangeImpl::insertNode(DOMNode* newNode)

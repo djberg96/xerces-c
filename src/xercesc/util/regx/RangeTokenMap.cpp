@@ -168,7 +168,7 @@ void RangeTokenMap::addCategory(const XMLCh* const categoryName) {
 void RangeTokenMap::addRangeMap(const XMLCh* const categoryName,
                                 RangeFactory* const rangeFactory) {
 
-    fRangeMap->put((void*)categoryName, rangeFactory);
+    fRangeMap->put(const_cast<void*>(static_cast<const void*>(categoryName)), rangeFactory);
 }
 
 void RangeTokenMap::addKeywordMap(const XMLCh* const keyword,
@@ -190,7 +190,7 @@ void RangeTokenMap::addKeywordMap(const XMLCh* const keyword,
         return;
     }
 
-    fTokenRegistry->put((void*) keyword, new RangeTokenElemMap(categId));
+    fTokenRegistry->put(const_cast<void*>(static_cast<const void*>(keyword)), new RangeTokenElemMap(categId));
 }
 
 // ---------------------------------------------------------------------------
