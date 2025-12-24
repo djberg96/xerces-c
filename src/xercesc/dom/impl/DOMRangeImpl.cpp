@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,12 +44,12 @@ namespace XERCES_CPP_NAMESPACE {
 
 DOMRangeImpl::DOMRangeImpl(DOMDocument* doc, MemoryManager* const manager)
 
-    :   fStartContainer(doc),     
+    :   fStartContainer(doc),
         fStartOffset(0),
         fEndContainer(doc),
-        fEndOffset(0),        
+        fEndOffset(0),
         fCollapsed(true),
-        fDocument(doc),   
+        fDocument(doc),
         fDetached(false),
         fRemoveChild(0),
         fMemoryManager(manager)
@@ -711,9 +711,8 @@ DOMDocumentFragment* DOMRangeImpl::extractContents()
 
 DOMDocumentFragment* DOMRangeImpl::cloneContents() const
 {
-    // cast off const.
-    return ((DOMRangeImpl *)this)->traverseContents(CLONE_CONTENTS);
-}
+    // cloneContents doesn't modify the range state, just the cast
+    return const_cast<DOMRangeImpl*>(this)->traverseContents(CLONE_CONTENTS);\n}
 
 
 void DOMRangeImpl::insertNode(DOMNode* newNode)
@@ -1017,7 +1016,7 @@ bool DOMRangeImpl::isLegalContainedNode(const DOMNode* node ) const {
             return false;
        default:
             return true;
-   }   
+   }
 }
 
 XMLSize_t DOMRangeImpl::indexOf(const DOMNode* child, const DOMNode* parent) const

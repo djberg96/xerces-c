@@ -33,7 +33,7 @@ namespace XERCES_CPP_NAMESPACE {
 DOMAttrImpl::DOMAttrImpl(DOMDocument *ownerDoc, const XMLCh *aName)
     : fNode(this, ownerDoc), fParent(this, ownerDoc), fSchemaType(nullptr)
 {
-    DOMDocumentImpl *docImpl = (DOMDocumentImpl *)ownerDoc;
+    DOMDocumentImpl *docImpl = static_cast<DOMDocumentImpl*>(ownerDoc);
     fName = docImpl->getPooledString(aName);
     fNode.isSpecified(true);
 }
@@ -53,7 +53,7 @@ DOMAttrImpl::DOMAttrImpl(const DOMAttrImpl &other, bool /*deep*/)
     if (other.fNode.isIdAttr())
     {
         fNode.isIdAttr(true);
-        DOMDocumentImpl *doc = (DOMDocumentImpl *)fParent.fOwnerDocument;
+        DOMDocumentImpl *doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
         doc->getNodeIDMap()->add(this);
     }
 
@@ -124,7 +124,7 @@ const XMLCh * DOMAttrImpl::getValue() const
     // In such case, we have to visit each child to retrieve the text
     //
 
-    DOMDocumentImpl* doc = (DOMDocumentImpl*)fParent.fOwnerDocument;
+    DOMDocumentImpl* doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
 
     XMLBuffer buf(1023, doc->getMemoryManager());
     for (node = fParent.fFirstChild; node != nullptr; node = castToChildImpl(node)->nextSibling)
@@ -174,7 +174,7 @@ void DOMAttrImpl::setValue(const XMLCh *val)
     //    then put it back in with the new name.  For now, we don't worry
     //    about what happens if the new name conflicts
     //
-    DOMDocumentImpl *doc = (DOMDocumentImpl *)fParent.fOwnerDocument;
+    DOMDocumentImpl *doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
     if (fNode.isIdAttr())
         doc->getNodeIDMap()->remove(this);
 
@@ -212,7 +212,7 @@ DOMElement *DOMAttrImpl::getOwnerElement() const
 {
     // if we have an owner, ownerNode is our ownerElement, otherwise it's
     // our ownerDocument and we don't have an ownerElement
-    return (DOMElement *) (fNode.isOwned() ? fNode.fOwnerNode : 0);
+    return static_cast<DOMElement*>(fNode.isOwned() ? fNode.fOwnerNode : nullptr);
 }
 
 
@@ -232,7 +232,7 @@ void DOMAttrImpl::release()
     if (fNode.isOwned() && !fNode.isToBeReleased())
         throw DOMException(DOMException::INVALID_ACCESS_ERR,0, GetDOMNodeMemoryManager);
 
-    DOMDocumentImpl* doc = (DOMDocumentImpl*)fParent.fOwnerDocument;
+    DOMDocumentImpl* doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
     if (doc) {
         fNode.callUserDataHandlers(DOMUserDataHandler::NODE_DELETED, 0, 0);
         fParent.release();
@@ -253,7 +253,7 @@ bool DOMAttrImpl::isId() const {
 DOMNode* DOMAttrImpl::rename(const XMLCh* namespaceURI, const XMLCh* name)
 {
     DOMElement* el = getOwnerElement();
-    DOMDocumentImpl* doc = (DOMDocumentImpl*)fParent.fOwnerDocument;
+    DOMDocumentImpl* doc = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
 
     if (el)
         el->removeAttributeNode(this);
@@ -321,7 +321,7 @@ bool DOMAttrImpl::isSupported(const XMLCh *feature, const XMLCh *version) const
 void* DOMAttrImpl::getFeature(const XMLCh* feature, const XMLCh* version) const
 {
     if(XMLString::equals(feature, XMLUni::fgXercescInterfacePSVITypeInfo))
-        return (DOMPSVITypeInfo*)fSchemaType;
+        return const_cast<DOMPSVITypeInfo*>(static_cast<const DOMPSVITypeInfo*>(fSchemaType));
     return fNode.getFeature(feature, version);
 }
 

@@ -32,7 +32,7 @@ namespace XERCES_CPP_NAMESPACE {
 
 DOMCharacterDataImpl::DOMCharacterDataImpl(DOMDocument *doc, const XMLCh *dat)
 {
-    fDoc = (DOMDocumentImpl*)doc;
+    fDoc = static_cast<DOMDocumentImpl*>(doc);
 
     XMLSize_t len=XMLString::stringLen(dat);
     fDataBuf = fDoc->popBuffer(len+1);
@@ -44,7 +44,7 @@ DOMCharacterDataImpl::DOMCharacterDataImpl(DOMDocument *doc, const XMLCh *dat)
 DOMCharacterDataImpl::
 DOMCharacterDataImpl(DOMDocument *doc, const XMLCh* dat, XMLSize_t len)
 {
-    fDoc = (DOMDocumentImpl*)doc;
+    fDoc = static_cast<DOMDocumentImpl*>(doc);
 
     fDataBuf = fDoc->popBuffer(len+1);
 
@@ -56,7 +56,7 @@ DOMCharacterDataImpl(DOMDocument *doc, const XMLCh* dat, XMLSize_t len)
 
 DOMCharacterDataImpl::DOMCharacterDataImpl(const DOMCharacterDataImpl &other)
 {
-    fDoc = (DOMDocumentImpl*)other.fDoc;
+    fDoc = static_cast<DOMDocumentImpl*>(other.fDoc);
 
     XMLSize_t len=other.getLength();
     fDataBuf = fDoc->popBuffer(len+1);
@@ -82,14 +82,14 @@ void DOMCharacterDataImpl::setNodeValue(const DOMNode *node, const XMLCh *value)
         throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR, 0, GetDOMCharacterDataImplMemoryManager);
     fDataBuf->set(value);
 
-    DOMDocumentImpl *doc = (DOMDocumentImpl *)node->getOwnerDocument();
+    DOMDocumentImpl *doc = static_cast<DOMDocumentImpl*>(const_cast<DOMDocument*>(node->getOwnerDocument()));
     if (doc != 0) {
         Ranges* ranges = doc->getRanges();
         if (ranges != 0) {
             XMLSize_t sz = ranges->size();
             if (sz != 0) {
                 for (XMLSize_t i =0; i<sz; i++) {
-                    ranges->elementAt(i)->receiveReplacedText((DOMNode*)node);
+                    ranges->elementAt(i)->receiveReplacedText(const_cast<DOMNode*>(node));
                 }
             }
         }
@@ -155,10 +155,10 @@ void DOMCharacterDataImpl::deleteData(const DOMNode *node, XMLSize_t offset, XML
     XMLCh* newString;
     XMLCh temp[4096];
     if (newLen >= 4095)
-        newString = (XMLCh*) XMLPlatformUtils::fgMemoryManager->allocate
+        newString = static_cast<XMLCh*>(XMLPlatformUtils::fgMemoryManager->allocate
         (
             (newLen+1) * sizeof(XMLCh)
-        );//new XMLCh[newLen+1];
+        ));//new XMLCh[newLen+1];
     else
         newString = temp;
 
@@ -174,14 +174,14 @@ void DOMCharacterDataImpl::deleteData(const DOMNode *node, XMLSize_t offset, XML
     //   the old string (may be shared)
     //   It just hangs around, possibly orphaned.
 
-    DOMDocumentImpl *doc = (DOMDocumentImpl *)node->getOwnerDocument();
+    DOMDocumentImpl *doc = static_cast<DOMDocumentImpl*>(const_cast<DOMDocument*>(node->getOwnerDocument()));
     if (doc != 0) {
         Ranges* ranges = doc->getRanges();
         if (ranges != 0) {
             XMLSize_t sz = ranges->size();
             if (sz != 0) {
                 for (XMLSize_t i =0; i<sz; i++) {
-                    ranges->elementAt(i)->updateRangeForDeletedText( (DOMNode*)node, offset, count);
+                    ranges->elementAt(i)->updateRangeForDeletedText(const_cast<DOMNode*>(node), offset, count);
                 }
             }
         }
@@ -227,10 +227,10 @@ void DOMCharacterDataImpl::insertData(const DOMNode *node, XMLSize_t offset, con
     XMLCh* newString;
     XMLCh temp[4096];
     if (newLen >= 4095)
-        newString = (XMLCh*) XMLPlatformUtils::fgMemoryManager->allocate
+        newString = static_cast<XMLCh*>(XMLPlatformUtils::fgMemoryManager->allocate
         (
             (newLen + 1) * sizeof(XMLCh)
-        );//new XMLCh[newLen+1];
+        ));//new XMLCh[newLen+1];
     else
         newString = temp;
 
@@ -243,14 +243,14 @@ void DOMCharacterDataImpl::insertData(const DOMNode *node, XMLSize_t offset, con
     if (newLen >= 4095)
         XMLPlatformUtils::fgMemoryManager->deallocate(newString);//delete[] newString;
 
-    DOMDocumentImpl *doc = (DOMDocumentImpl *)node->getOwnerDocument();
+    DOMDocumentImpl *doc = static_cast<DOMDocumentImpl*>(const_cast<DOMDocument*>(node->getOwnerDocument()));
     if (doc != 0) {
         Ranges* ranges = doc->getRanges();
         if (ranges != 0) {
             XMLSize_t sz = ranges->size();
             if (sz != 0) {
                 for (XMLSize_t i =0; i<sz; i++) {
-                    ranges->elementAt(i)->updateRangeForInsertedText( (DOMNode*)node, offset, datLen);
+                    ranges->elementAt(i)->updateRangeForInsertedText(const_cast<DOMNode*>(node), offset, datLen);
                 }
             }
         }
@@ -296,15 +296,15 @@ const XMLCh * DOMCharacterDataImpl::substringData(const DOMNode *node, XMLSize_t
     if (offset > len)
         throw DOMException(DOMException::INDEX_SIZE_ERR, 0, GetDOMCharacterDataImplMemoryManager);
 
-    DOMDocumentImpl *doc = (DOMDocumentImpl *)node->getOwnerDocument();
+    DOMDocumentImpl *doc = static_cast<DOMDocumentImpl*>(const_cast<DOMDocument*>(node->getOwnerDocument()));
 
     XMLCh* newString;
     XMLCh temp[4096];
     if (len >= 4095)
-      newString = (XMLCh*) doc->getMemoryManager()->allocate
+      newString = static_cast<XMLCh*>(doc->getMemoryManager()->allocate
         (
             (len + 1) * sizeof(XMLCh)
-        );//new XMLCh[len+1];
+        ));//new XMLCh[len+1];
     else
         newString = temp;
 
