@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -325,11 +325,11 @@ void BlockRangeFactory::buildRanges(RangeTokenMap *rangeTokMap) {
         RangeToken* tok = tokFactory->createRange();
         tok->addRange(blockRanges[i*2], blockRanges[(i*2)+1]);
 
-        if (!foundSpecial && XMLString::equals((XMLCh*)fgBlockNames[i] , (XMLCh*) fgBlockIsSpecials)) {
+        if (!foundSpecial && XMLString::equals(fgBlockNames[i], fgBlockIsSpecials)) {
             tok->addRange(0xFFF0, 0xFFFD);
             foundSpecial = true;
         }
-        if (!foundPrivate && XMLString::equals((XMLCh*)fgBlockNames[i] , (XMLCh*) fgBlockIsPrivateUse)) {
+        if (!foundPrivate && XMLString::equals(fgBlockNames[i], fgBlockIsPrivateUse)) {
             tok->addRange(0xF0000, 0xFFFFD);
             tok->addRange(0x100000, 0x10FFFD);
             foundPrivate = true;
