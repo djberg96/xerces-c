@@ -174,10 +174,10 @@ jobs:
       with:
         fetch-depth: 1
 
-    - name: Install ICU (if needed)
+    - name: Install ICU via vcpkg (if needed)
       if: matrix.msgloader == 'icu' || matrix.transcoder == 'icu'
       run: |
-        choco install icu4c -y
+        vcpkg install icu:x64-windows
 
     - name: Configure CMake
       run: |
@@ -186,6 +186,9 @@ jobs:
           "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}",
           "-DBUILD_SHARED_LIBS:BOOL=${{ matrix.shared }}"
         )
+        if ("${{ matrix.msgloader }}" -eq "icu" -or "${{ matrix.transcoder }}" -eq "icu") {
+          $args += "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        }
         if ("${{ matrix.network }}") { $args += "-Dnetwork:BOOL=${{ matrix.network }}" }
         if ("${{ matrix.netaccessor }}") { $args += "-Dnetwork-accessor=${{ matrix.netaccessor }}" }
         if ("${{ matrix.msgloader }}") { $args += "-Dmessage-loader=${{ matrix.msgloader }}" }
