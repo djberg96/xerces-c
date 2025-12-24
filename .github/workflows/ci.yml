@@ -1,0 +1,263 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, trunk ]
+  pull_request:
+    branches: [ main, master, trunk ]
+  workflow_dispatch:
+
+jobs:
+  # Linux builds with various configurations
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # GCC builds
+          - name: "GCC Debug - Network ON, ICU transcoder"
+            compiler: gcc
+            cxx: g++
+            build_type: Debug
+            shared: ON
+            network: ON
+            transcoder: icu
+            msgloader: icu
+
+          - name: "GCC Release - Network OFF"
+            compiler: gcc
+            cxx: g++
+            build_type: Release
+            shared: ON
+            network: OFF
+
+          - name: "GCC Static - iconv transcoder"
+            compiler: gcc
+            cxx: g++
+            build_type: Release
+            shared: OFF
+            transcoder: iconv
+            xmlch: char16_t
+
+          # Clang builds
+          - name: "Clang Debug - Network ON"
+            compiler: clang
+            cxx: clang++
+            build_type: Debug
+            shared: ON
+            network: ON
+
+          - name: "Clang Release - Static"
+            compiler: clang
+            cxx: clang++
+            build_type: Release
+            shared: OFF
+            network: ON
+            netaccessor: curl
+
+    name: "${{ matrix.name }}"
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build libcurl4-openssl-dev libicu-dev
+
+    - name: Configure CMake
+      env:
+        CC: ${{ matrix.compiler }}
+        CXX: ${{ matrix.cxx }}
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.shared }} \
+          ${{ matrix.network && format('-Dnetwork:BOOL={0}', matrix.network) || '' }} \
+          ${{ matrix.netaccessor && format('-Dnetwork-accessor={0}', matrix.netaccessor) || '' }} \
+          ${{ matrix.msgloader && format('-Dmessage-loader={0}', matrix.msgloader) || '' }} \
+          ${{ matrix.transcoder && format('-Dtranscoder={0}', matrix.transcoder) || '' }} \
+          ${{ matrix.xmlch && format('-Dxmlch-type={0}', matrix.xmlch) || '' }}
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }} -j$(nproc)
+
+    - name: Test
+      run: |
+        cd build
+        ctest -C ${{ matrix.build_type }} --output-on-failure -j$(nproc)
+
+  # macOS builds
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "macOS AppleClang Debug"
+            build_type: Debug
+            shared: ON
+            network: ON
+
+          - name: "macOS AppleClang Release - Static"
+            build_type: Release
+            shared: OFF
+            network: ON
+            transcoder: iconv
+
+    name: "${{ matrix.name }}"
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Install dependencies
+      run: |
+        brew install cmake ninja curl icu4c
+
+    - name: Configure CMake
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.shared }} \
+          ${{ matrix.network && format('-Dnetwork:BOOL={0}', matrix.network) || '' }} \
+          ${{ matrix.netaccessor && format('-Dnetwork-accessor={0}', matrix.netaccessor) || '' }} \
+          ${{ matrix.msgloader && format('-Dmessage-loader={0}', matrix.msgloader) || '' }} \
+          ${{ matrix.transcoder && format('-Dtranscoder={0}', matrix.transcoder) || '' }} \
+          ${{ matrix.xmlch && format('-Dxmlch-type={0}', matrix.xmlch) || '' }}
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }} -j$(sysctl -n hw.ncpu)
+
+    - name: Test
+      run: |
+        cd build
+        ctest -C ${{ matrix.build_type }} --output-on-failure -j$(sysctl -n hw.ncpu)
+
+  # Windows builds (MSVC)
+  windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "MSVC 2022 Release - Network ON, ICU"
+            build_type: Release
+            shared: ON
+            network: ON
+            msgloader: icu
+            transcoder: windows
+            xmlch: wchar_t
+
+          - name: "MSVC 2022 Debug - Network OFF, Static"
+            build_type: Debug
+            shared: OFF
+            network: OFF
+            netaccessor: winsock
+            msgloader: inmemory
+            transcoder: icu
+            xmlch: char16_t
+
+          - name: "MSVC 2022 Release - Default config"
+            build_type: Release
+            shared: ON
+            network: ON
+
+    name: "${{ matrix.name }}"
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Install ICU (if needed)
+      if: matrix.msgloader == 'icu' || matrix.transcoder == 'icu'
+      run: |
+        choco install icu4c -y
+
+    - name: Configure CMake
+      run: |
+        $args = @(
+          "-B", "build",
+          "-DCMAKE_BUILD_TYPE=${{ matrix.build_type }}",
+          "-DBUILD_SHARED_LIBS:BOOL=${{ matrix.shared }}"
+        )
+        if ("${{ matrix.network }}") { $args += "-Dnetwork:BOOL=${{ matrix.network }}" }
+        if ("${{ matrix.netaccessor }}") { $args += "-Dnetwork-accessor=${{ matrix.netaccessor }}" }
+        if ("${{ matrix.msgloader }}") { $args += "-Dmessage-loader=${{ matrix.msgloader }}" }
+        if ("${{ matrix.transcoder }}") { $args += "-Dtranscoder=${{ matrix.transcoder }}" }
+        if ("${{ matrix.xmlch }}") { $args += "-Dxmlch-type=${{ matrix.xmlch }}" }
+        cmake @args
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }} -j $env:NUMBER_OF_PROCESSORS
+
+    - name: Test
+      run: |
+        cd build
+        ctest -C ${{ matrix.build_type }} --output-on-failure -j $env:NUMBER_OF_PROCESSORS
+
+  # MinGW builds
+  mingw:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "MinGW Release - iconv"
+            build_type: Release
+            shared: ON
+            network: ON
+            transcoder: iconv
+
+          - name: "MinGW Debug - Windows transcoder, Static"
+            build_type: Debug
+            shared: OFF
+            network: ON
+            transcoder: windows
+            xmlch: wchar_t
+
+    name: "${{ matrix.name }}"
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-ninja
+          mingw-w64-x86_64-curl
+          make
+
+    - name: Configure CMake
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.shared }} \
+          ${{ matrix.network && format('-Dnetwork:BOOL={0}', matrix.network) || '' }} \
+          ${{ matrix.netaccessor && format('-Dnetwork-accessor={0}', matrix.netaccessor) || '' }} \
+          ${{ matrix.msgloader && format('-Dmessage-loader={0}', matrix.msgloader) || '' }} \
+          ${{ matrix.transcoder && format('-Dtranscoder={0}', matrix.transcoder) || '' }} \
+          ${{ matrix.xmlch && format('-Dxmlch-type={0}', matrix.xmlch) || '' }}
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }} -j$(nproc)
+
+    - name: Test
+      run: |
+        cd build
+        ctest -C ${{ matrix.build_type }} --output-on-failure -j$(nproc)
