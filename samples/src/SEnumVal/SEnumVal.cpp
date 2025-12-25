@@ -177,6 +177,7 @@ void process(char* const xmlFile)
     parser.setValidationScheme(SAXParser::Val_Always);
     parser.setDoNamespaces(true);
     parser.setDoSchema(true);
+    parser.setDisableDefaultEntityResolution(true);
 
 	parser.parse(xmlFile);
 
