@@ -66,6 +66,7 @@ XSAnnotation::~XSAnnotation()
 void XSAnnotation::writeAnnotation(DOMNode* node, ANNOTATION_TARGET targetType)
 {
     XercesDOMParser *parser = new (fMemoryManager) XercesDOMParser(0, fMemoryManager);
+    parser->setDisableDefaultEntityResolution(true);
     parser->setDoNamespaces(true);
     parser->setValidationScheme(XercesDOMParser::Val_Never);
 
