@@ -42,6 +42,7 @@
 #include <xercesc/dom/DOMLSParserFilter.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/validators/common/CMStateSet.hpp>
+#include <xercesc/util/XMLUni.hpp>
 
 #define UNUSED(x) { if(x!=0){} }
 
@@ -4990,6 +4991,9 @@ bool DOMTest::testLSExceptions() {
     static const XMLCh gLS[] = { chLatin_L, chLatin_S, chNull };
     DOMImplementationLS *impl = (DOMImplementationLS*)DOMImplementationRegistry::getDOMImplementation(gLS);
     DOMLSParser       *domBuilder = impl->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+    DOMConfiguration  *config = domBuilder->getDomConfig();
+    config->setParameter(XMLUni::fgXercesDisableDefaultEntityResolution, true);
+    config->setParameter(XMLUni::fgXercesLoadExternalDTD, false);
     DOMLSInput        *input = impl->createLSInput();
     XMLString::transcode(sXml, tempStr, 3999);
     input->setStringData(tempStr);
