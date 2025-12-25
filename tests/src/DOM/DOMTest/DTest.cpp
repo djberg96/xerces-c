@@ -5183,6 +5183,15 @@ bool DOMTest::testElementTraversal() {
     DOMImplementationLS *impl = (DOMImplementationLS*)DOMImplementationRegistry::getDOMImplementation(gLS);
     DOMLSParser       *domBuilder = impl->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
     DOMLSInput        *input = impl->createLSInput();
+
+    if (domBuilder && domBuilder->getDomConfig()) {
+        domBuilder->getDomConfig()->setParameter(XMLUni::fgXercesLoadExternalDTD, false);
+        domBuilder->getDomConfig()->setParameter(XMLUni::fgDOMDisallowDoctype, true);
+        domBuilder->getDomConfig()->setParameter(XMLUni::fgXercesDisableDefaultEntityResolution, true);
+        domBuilder->getDomConfig()->setParameter(XMLUni::fgSAX2CoreExternalGeneralEntities, false);
+        domBuilder->getDomConfig()->setParameter(XMLUni::fgSAX2CoreExternalParameterEntities, false);
+    }
+
     XMLString::transcode(sXml, tempStr, 3999);
     input->setStringData(tempStr);
     try
