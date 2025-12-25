@@ -121,7 +121,10 @@ static DOMDocument* parseFile(char *fileName)
 {
     ParseErrorHandler eh;
     if (!parser)
+    {
         parser = new XercesDOMParser;
+        parser->setDisableDefaultEntityResolution(true);
+    }
     parser->setValidationScheme(AbstractDOMParser::Val_Never);
     parser->setErrorHandler(&eh);
     try
