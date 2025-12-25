@@ -177,6 +177,18 @@ jobs:
       with:
         fetch-depth: 1
 
+    - name: Cache vcpkg packages
+      if: matrix.msgloader == 'icu' || matrix.transcoder == 'icu'
+      uses: actions/cache@v4
+      with:
+        path: |
+          C:/vcpkg/installed
+          C:/vcpkg/packages
+        key: ${{ runner.os }}-vcpkg-icu-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-icu-
+          ${{ runner.os }}-vcpkg-
+
     - name: Install ICU via vcpkg (if needed)
       if: matrix.msgloader == 'icu' || matrix.transcoder == 'icu'
       run: |
