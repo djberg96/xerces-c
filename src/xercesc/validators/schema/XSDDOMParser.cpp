@@ -57,6 +57,7 @@ XSDDOMParser::XSDDOMParser( XMLValidator* const   valToAdopt
     fXSDErrorReporter.setErrorReporter(this);
     setValidationScheme(XercesDOMParser::Val_Never);
     setDoNamespaces(true);
+    setDisableDefaultEntityResolution(true);
 }
 
 
