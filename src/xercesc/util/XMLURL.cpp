@@ -704,7 +704,7 @@ void XMLURL::makeRelativeTo(const XMLURL& baseURL)
 //  full text. We don't do this unless someone asks us to, since its often
 //  never required.
 //
-void XMLURL::buildFullText()
+void XMLURL::buildFullText() const
 {
     // Calculate the worst case size of the buffer required
     XMLSize_t bufSize = gMaxProtoLen + 1

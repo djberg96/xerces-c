@@ -52,7 +52,7 @@ protected:
     DOMImplementationImpl() {};
 
 public:
-    virtual ~DOMImplementationImpl() {};
+    virtual ~DOMImplementationImpl() = default;
     static DOMImplementationImpl*   getDOMImplementationImpl();
     static XMLMsgLoader* getMsgLoader4DOM();
 

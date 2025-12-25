@@ -88,7 +88,7 @@ DOMNodeIteratorImpl::~DOMNodeIteratorImpl ()
 void DOMNodeIteratorImpl::detach ()
 {
 	fDetached = true;
-   ((DOMDocumentImpl *)fDocument)->removeNodeIterator(this);
+   static_cast<DOMDocumentImpl*>(fDocument)->removeNodeIterator(this);
 }
 
 

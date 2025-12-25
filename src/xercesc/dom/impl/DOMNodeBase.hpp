@@ -75,7 +75,7 @@ public:
      * Destructor
      *
      */
-    virtual ~HasDOMNodeImpl() {};
+    virtual ~HasDOMNodeImpl() = default;
     //@}
 
     // -----------------------------------------------------------------------
@@ -133,7 +133,7 @@ public:
      * Destructor
      *
      */
-    virtual ~HasDOMParentImpl() {};
+    virtual ~HasDOMParentImpl() = default;
     //@}
 
     // -----------------------------------------------------------------------
@@ -191,7 +191,7 @@ public:
      * Destructor
      *
      */
-    virtual ~HasDOMChildImpl() {};
+    virtual ~HasDOMChildImpl() = default;
     //@}
 
     // -----------------------------------------------------------------------
@@ -233,7 +233,7 @@ public:
 #define DOMCHILDIMPL_DECL \
     virtual DOMChildNode* getChildNodeImpl(); \
     virtual const DOMChildNode* getChildNodeImpl() const;
-    
+
 #define DOMCHILDIMPL_IMPL(classname) \
     DOMChildNode*       classname::getChildNodeImpl() {return &fChild;} \
     const DOMChildNode* classname::getChildNodeImpl() const {return &fChild;}

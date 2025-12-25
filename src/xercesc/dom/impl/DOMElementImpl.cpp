@@ -142,15 +142,14 @@ DOMAttr *DOMElementImpl::getAttributeNode(const XMLCh *nam) const
 
 DOMNamedNodeMap *DOMElementImpl::getAttributes() const
 {
-    DOMElementImpl *ncThis = (DOMElementImpl *)this;   // cast off const
-    return ncThis->fAttributes;
+    return const_cast<DOMElementImpl*>(this)->fAttributes;
 }
 
 
 
 DOMNodeList *DOMElementImpl::getElementsByTagName(const XMLCh *tagname) const
 {
-    DOMDocumentImpl *docImpl = (DOMDocumentImpl *)fParent.fOwnerDocument;
+    DOMDocumentImpl *docImpl = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
     return docImpl->getDeepNodeList(this,tagname);
 }
 
@@ -171,7 +170,7 @@ void DOMElementImpl::removeAttribute(const XMLCh *nam)
     if (i >= 0)
     {
         DOMNode *att = fAttributes->removeNamedItemAt(i);
-        ((DOMAttrImpl *)att)->removeAttrFromIDNodeMap();
+        static_cast<DOMAttrImpl*>(att)->removeAttrFromIDNodeMap();
         att->release();
     }
 }
@@ -199,7 +198,7 @@ DOMAttr *DOMElementImpl::removeAttributeNode(DOMAttr *oldAttr)
         found = fAttributes->item(i);
         if (found == oldAttr) {
             fAttributes->removeNamedItemAt(i);
-            ((DOMAttrImpl *)oldAttr)->removeAttrFromIDNodeMap();
+            static_cast<DOMAttrImpl*>(oldAttr)->removeAttrFromIDNodeMap();
         }
         else
             throw DOMException(DOMException::NOT_FOUND_ERR, 0, GetDOMNodeMemoryManager);
@@ -208,7 +207,7 @@ DOMAttr *DOMElementImpl::removeAttributeNode(DOMAttr *oldAttr)
     else
         throw DOMException(DOMException::NOT_FOUND_ERR, 0, GetDOMNodeMemoryManager);
 
-   return (DOMAttr *)found;
+   return static_cast<DOMAttr*>(found);
 }
 
 
@@ -241,9 +240,9 @@ void DOMElementImpl::setIdAttribute(const XMLCh* name, bool isId)
         throw DOMException(DOMException::NOT_FOUND_ERR, 0, GetDOMNodeMemoryManager);
 
     if(isId)
-        ((DOMAttrImpl *)attr)->addAttrToIDNodeMap();
+        static_cast<DOMAttrImpl*>(attr)->addAttrToIDNodeMap();
     else
-        ((DOMAttrImpl *)attr)->removeAttrFromIDNodeMap();
+        static_cast<DOMAttrImpl*>(attr)->removeAttrFromIDNodeMap();
 }
 
 void DOMElementImpl::setIdAttributeNS(const XMLCh* namespaceURI, const XMLCh* localName, bool isId) {
@@ -258,9 +257,9 @@ void DOMElementImpl::setIdAttributeNS(const XMLCh* namespaceURI, const XMLCh* lo
         throw DOMException(DOMException::NOT_FOUND_ERR, 0, GetDOMNodeMemoryManager);
 
     if(isId)
-        ((DOMAttrImpl *)attr)->addAttrToIDNodeMap();
+        static_cast<DOMAttrImpl*>(attr)->addAttrToIDNodeMap();
     else
-        ((DOMAttrImpl *)attr)->removeAttrFromIDNodeMap();
+        static_cast<DOMAttrImpl*>(attr)->removeAttrFromIDNodeMap();
 }
 
 
@@ -281,9 +280,9 @@ void DOMElementImpl::setIdAttributeNode(const DOMAttr *idAttr, bool isId) {
         throw DOMException(DOMException::NOT_FOUND_ERR, 0, GetDOMNodeMemoryManager);
 
     if(isId)
-        ((DOMAttrImpl *)attr)->addAttrToIDNodeMap();
+        static_cast<DOMAttrImpl*>(attr)->addAttrToIDNodeMap();
     else
-        ((DOMAttrImpl *)attr)->removeAttrFromIDNodeMap();
+        static_cast<DOMAttrImpl*>(attr)->removeAttrFromIDNodeMap();
 }
 
 
@@ -298,7 +297,7 @@ DOMAttr * DOMElementImpl::setAttributeNode(DOMAttr *newAttr)
         // revisit.  Exception doesn't match test.
 
     // This will throw INUSE if necessary
-    DOMAttr *oldAttr = (DOMAttr *) fAttributes->setNamedItem(newAttr);
+    DOMAttr *oldAttr = static_cast<DOMAttr*>(fAttributes->setNamedItem(newAttr));
 
     return oldAttr;
 }
@@ -323,7 +322,7 @@ const XMLCh * DOMElementImpl::getAttributeNS(const XMLCh *fNamespaceURI,
     const XMLCh *fLocalName) const
 {
     DOMAttr * attr=
-      (DOMAttr *)(fAttributes->getNamedItemNS(fNamespaceURI, fLocalName));
+      static_cast<DOMAttr*>(fAttributes->getNamedItemNS(fNamespaceURI, fLocalName));
     return (attr==0) ? XMLUni::fgZeroLenString : attr->getValue();
 }
 
@@ -368,7 +367,7 @@ void DOMElementImpl::removeAttributeNS(const XMLCh *fNamespaceURI,
 DOMAttr *DOMElementImpl::getAttributeNodeNS(const XMLCh *fNamespaceURI,
     const XMLCh *fLocalName) const
 {
-    return (DOMAttr *)fAttributes->getNamedItemNS(fNamespaceURI, fLocalName);
+    return static_cast<DOMAttr*>(fAttributes->getNamedItemNS(fNamespaceURI, fLocalName));
 }
 
 
@@ -382,7 +381,7 @@ DOMAttr *DOMElementImpl::setAttributeNodeNS(DOMAttr *newAttr)
         throw DOMException(DOMException::WRONG_DOCUMENT_ERR, 0, GetDOMNodeMemoryManager);
 
     // This will throw INUSE if necessary
-    DOMAttr *oldAttr = (DOMAttr *) fAttributes->setNamedItemNS(newAttr);
+    DOMAttr *oldAttr = static_cast<DOMAttr*>(fAttributes->setNamedItemNS(newAttr));
 
     return oldAttr;
 }
@@ -391,7 +390,7 @@ DOMAttr *DOMElementImpl::setAttributeNodeNS(DOMAttr *newAttr)
 DOMNodeList *DOMElementImpl::getElementsByTagNameNS(const XMLCh *namespaceURI,
     const XMLCh *localName) const
 {
-    DOMDocumentImpl *docImpl = (DOMDocumentImpl *)fParent.fOwnerDocument;
+    DOMDocumentImpl *docImpl = static_cast<DOMDocumentImpl*>(fParent.fOwnerDocument);
     return docImpl->getDeepNodeList(this, namespaceURI, localName);
 }
 
@@ -428,8 +427,8 @@ void DOMElementImpl::setupDefaultAttributes()
     if ((fNode.fOwnerNode == nullptr) || (tmpdoc == nullptr) || (tmpdoc->getDoctype() == nullptr))
         return;
 
-    DOMNode *eldef = ((DOMDocumentTypeImpl*)tmpdoc->getDoctype())->getElements()->getNamedItem(getNodeName());
-    DOMAttrMapImpl* defAttrs = (eldef == nullptr) ? nullptr : (DOMAttrMapImpl *)(eldef->getAttributes());
+    DOMNode *eldef = static_cast<DOMDocumentTypeImpl*>(tmpdoc->getDoctype())->getElements()->getNamedItem(getNodeName());
+    DOMAttrMapImpl* defAttrs = (eldef == nullptr) ? nullptr : static_cast<DOMAttrMapImpl*>(eldef->getAttributes());
 
     if (defAttrs)
         fDefaultAttributes = new (tmpdoc) DOMAttrMapImpl(this, defAttrs);
