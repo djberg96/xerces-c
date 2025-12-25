@@ -784,7 +784,7 @@ IGXMLScanner::buildAttList(const  RefVectorOf<KVStringPair>&  providedAttrs
             const XMLAttDef *curDef = &attDefList.getAttDef(i);
             const XMLAttDef::DefAttTypes defType = curDef->getDefaultType();
             unsigned int *attCountPtr = fAttDefRegistry->get((void *)curDef);
-            if (!attCountPtr || *attCountPtr < fElemCount)
+            if (!attCountPtr || (*attCountPtr < fElemCount))
             { // did not occur
                 // note that since there is no attribute information
                 // item present, there is no PSVI infoset to augment here *except*
@@ -918,7 +918,7 @@ IGXMLScanner::buildAttList(const  RefVectorOf<KVStringPair>&  providedAttrs
                     }
                 }
             }
-            else if(attCountPtr)
+            else
             {
                 //attribute is provided
                 // (schema) report error for PROHIBITED attrs that are present (V_TAGc)
