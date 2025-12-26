@@ -1,0 +1,154 @@
+XML External Entity (XXE) Attack Prevention in Xerces-C
+========================================================
+
+OVERVIEW
+--------
+XML External Entity (XXE) attacks are a type of security vulnerability that
+occurs when an XML parser processes external entity references in XML documents.
+Attackers can exploit this to:
+
+1. Read arbitrary files from the server
+2. Perform Server-Side Request Forgery (SSRF) attacks
+3. Cause Denial of Service (DoS) through billion laughs attacks
+4. Exfiltrate sensitive data
+
+SECURE DEFAULTS (Current Version)
+----------------------------------
+As of this version, Xerces-C has been updated with secure defaults to prevent
+XXE attacks:
+
+1. External DTD Loading is DISABLED by default
+   - fLoadExternalDTD = false
+   - External DTD references will not be processed unless explicitly enabled
+
+2. Default Entity Resolution is DISABLED by default
+   - fDisableDefaultEntityResolution = true
+   - External entities will not be resolved unless a custom EntityResolver
+     is provided
+
+MIGRATION GUIDE
+---------------
+If your application was relying on the previous insecure defaults, you may need
+to explicitly enable external DTD loading:
+
+    parser->setLoadExternalDTD(true);  // Enable only if necessary and input is trusted
+
+WARNING: Only enable external DTD loading and entity resolution if:
+- You fully trust the source of your XML documents
+- You have implemented strict input validation
+- You have implemented a restrictive custom EntityResolver that limits
+  access to specific, trusted resources only
+
+SECURE CODING PRACTICES
+------------------------
+
+1. Use Secure Defaults
+   The parser now uses secure defaults. Do not change them unless absolutely
+   necessary.
+
+2. Implement a Restrictive EntityResolver
+   If you must process external entities, implement a custom EntityResolver
+   that whitelists specific allowed resources:
+
+    class SecureEntityResolver : public EntityResolver {
+    public:
+        InputSource* resolveEntity(const XMLCh* const publicId,
+                                  const XMLCh* const systemId) {
+            // Only allow specific trusted DTDs
+            if (XMLString::equals(systemId, "file:///path/to/trusted.dtd")) {
+                return new LocalFileInputSource("/path/to/trusted.dtd");
+            }
+            // Reject all other external entities
+            return NULL;
+        }
+    };
+
+    parser->setEntityResolver(new SecureEntityResolver());
+    parser->setDisableDefaultEntityResolution(true);  // Keep secure default
+
+3. Use SecurityManager
+   Always set entity expansion limits to prevent billion laughs attacks:
+
+    SecurityManager* secMgr = new SecurityManager();
+    secMgr->setEntityExpansionLimit(10000);
+    parser->setSecurityManager(secMgr);
+
+4. Consider Disabling DOCTYPE Processing
+   If your application doesn't need DTD support at all:
+
+    parser->setDisallowDoctype(true);
+
+5. Validate Input
+   Always validate and sanitize XML input from untrusted sources before parsing.
+
+EXAMPLE: SECURE PARSER CONFIGURATION
+-------------------------------------
+
+SAXParser parser;
+
+// Keep secure defaults (these are now the default values)
+// parser.setLoadExternalDTD(false);  // Already false by default
+// parser.setDisableDefaultEntityResolution(true);  // Already true by default
+
+// Add entity expansion protection
+SecurityManager* secMgr = new SecurityManager();
+secMgr->setEntityExpansionLimit(10000);
+parser.setSecurityManager(secMgr);
+
+// Optional: Completely disable DOCTYPE if not needed
+parser.setDisallowDoctype(true);
+
+// Optional: Use custom EntityResolver for fine-grained control
+// parser.setEntityResolver(mySecureResolver);
+
+try {
+    parser.parse(xmlFile);
+} catch (const XMLException& e) {
+    // Handle exception
+}
+
+delete secMgr;
+
+TESTING FOR XXE VULNERABILITIES
+--------------------------------
+Test your application with the following XXE payloads (in a safe environment):
+
+1. File Disclosure Test:
+<?xml version="1.0"?>
+<!DOCTYPE foo [
+  <!ENTITY xxe SYSTEM "file:///etc/passwd">
+]>
+<root>&xxe;</root>
+
+2. SSRF Test:
+<?xml version="1.0"?>
+<!DOCTYPE foo [
+  <!ENTITY xxe SYSTEM "http://internal-server/secret">
+]>
+<root>&xxe;</root>
+
+3. Billion Laughs Test:
+<?xml version="1.0"?>
+<!DOCTYPE lolz [
+  <!ENTITY lol "lol">
+  <!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+  <!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">
+]>
+<lolz>&lol3;</lolz>
+
+With secure defaults, these attacks should be prevented.
+
+REFERENCES
+----------
+- OWASP XXE Prevention Cheat Sheet:
+  https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+
+- CWE-611: Improper Restriction of XML External Entity Reference:
+  https://cwe.mitre.org/data/definitions/611.html
+
+CONTACT
+-------
+For security issues, please follow the Apache Security reporting guidelines:
+https://www.apache.org/security/
+
+Last Updated: December 2025

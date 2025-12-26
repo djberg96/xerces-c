@@ -20,6 +20,22 @@
 
 <s1 title="Security Advisories">
 
+<s2 title="Security Improvements in This Release">
+<p>This release includes important security enhancements to protect against
+XXE (XML External Entity) attacks. The parser now uses secure defaults:</p>
+
+<ul>
+  <li><strong>External DTD Loading is DISABLED by default</strong> - The parser will not load external DTDs unless explicitly enabled via setLoadExternalDTD(true)</li>
+  <li><strong>Default Entity Resolution is DISABLED by default</strong> - External entities will not be resolved unless a custom EntityResolver is provided</li>
+</ul>
+
+<p>These changes may affect existing applications that rely on processing external entities.
+See <jump href="secadv/XXE-PREVENTION.txt">XXE Prevention Guide</jump> for migration guidance and secure coding practices.</p>
+
+<p><strong>WARNING:</strong> Only enable external entity processing if you fully trust the source
+of your XML documents or have implemented appropriate security controls.</p>
+</s2>
+
 <s2 title="Unaddressed Advisories">
 
 <p>The following security advisories apply to current versions of
