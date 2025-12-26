@@ -8189,6 +8189,7 @@ bool TraverseSchema::openRedefinedSchema(const DOMElement* const redefineElem) {
 
     fParser->setValidationScheme(XercesDOMParser::Val_Never);
     fParser->setDoNamespaces(true);
+    fParser->setDisableDefaultEntityResolution(true);
     fParser->setUserEntityHandler(fEntityHandler);
     fParser->setUserErrorReporter(fErrorReporter);
 
