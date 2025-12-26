@@ -570,17 +570,37 @@ XMLPlatformUtils::Terminate();
         that should suit most applications.
       </p>
       <p>
-        By default, &XercesCName; is a wholly conformant XML parser; that
-        is, no security-related considerations will be observed by
-        default. An application must provide an instance of the
-        SecurityManager class to a parser in order to make that
-        parser behave in a security-conscious manner.  For example:
+        <strong>IMPORTANT SECURITY NOTE - XXE (XML External Entity) Protection:</strong>
+        Starting with this version, &XercesCName; defaults to secure settings
+        that protect against XXE attacks. By default, external DTD loading
+        is disabled (<code>setLoadExternalDTD(false)</code>) and default entity
+        resolution is disabled (<code>setDisableDefaultEntityResolution(true)</code>).
+        If your application requires processing of external DTDs or entities,
+        you must explicitly enable these features. Be aware that enabling these
+        features may expose your application to XXE vulnerabilities if processing
+        untrusted XML documents. Always validate and sanitize input from untrusted
+        sources, and consider using a custom EntityResolver to restrict access
+        to specific, trusted resources only.
+      </p>
+      <p>
+        By default, &XercesCName; is now configured with security-conscious
+        defaults to prevent common XML security vulnerabilities. An application
+        that needs to process external entities must explicitly enable this
+        functionality and should provide an instance of the SecurityManager
+        class to a parser to further control resource consumption. For example:
       </p>
 <source>
 SAXParser *myParser = new SAXParser();
 SecurityManager *myManager = new SecurityManager();
 myManager->setEntityExpansionLimit(100000); // larger than default
 myParser->setSecurityManager(myManager);
+
+// Only enable external DTD if absolutely necessary and input is trusted
+// myParser->setLoadExternalDTD(true);  // Disabled by default for security
+
+// Only disable entity resolution protection if you have a custom EntityResolver
+// myParser->setDisableDefaultEntityResolution(false);  // Enabled by default for security
+
 // ... use the parser
 </source>
       <p>

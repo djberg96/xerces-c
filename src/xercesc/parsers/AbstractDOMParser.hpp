@@ -371,6 +371,7 @@ public :
       *
       * @return false, if the parser is currently configured to
       *         ignore external DTD completely, true otherwise.
+      *         Default is false (secure default).
       *
       * @see #setLoadExternalDTD
       * @see #getDisallowDoctype
@@ -831,7 +832,11 @@ public :
       * When set to false, the parser will ignore any external DTD completely
       * if the validationScheme is set to Val_Never.
       *
-      * The parser's default state is: true.
+      * <strong>SECURITY WARNING:</strong> The parser's default state is now: false (changed for security).
+      * Enabling external DTD loading can expose your application to XXE (XML External Entity)
+      * attacks when processing untrusted XML documents. Only enable this feature if you trust
+      * the source of your XML documents or have implemented appropriate security controls
+      * (such as a restrictive EntityResolver).
       *
       * This flag is ignored if the validationScheme is set to Val_Always or Val_Auto.
       *
@@ -841,6 +846,7 @@ public :
       * @see #getLoadExternalDTD
       * @see #setDisallowDoctype
       * @see #setValidationScheme
+      * @see #setDisableDefaultEntityResolution
       */
     void setLoadExternalDTD(const bool newState);
 
@@ -968,11 +974,17 @@ public :
       * is set to true, the parser will not attempt to resolve the entity
       * when the resolveEntity method returns NULL.
       *
-      * The parser's default state is false
+      * <strong>SECURITY NOTE:</strong> The parser's default state is now: true (changed for security).
+      * This prevents XXE (XML External Entity) attacks by blocking resolution of external
+      * entities when no custom EntityResolver is provided or when it returns NULL.
+      * Setting this to false may expose your application to XXE vulnerabilities when
+      * processing untrusted XML. Only set this to false if you have implemented a secure
+      * custom EntityResolver that properly restricts entity access.
       *
       * @param newValue The state to set
       *
       * @see #EntityResolver
+      * @see #setLoadExternalDTD
       */
     void setDisableDefaultEntityResolution(const bool newValue);
 
