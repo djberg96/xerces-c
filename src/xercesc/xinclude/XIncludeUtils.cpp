@@ -464,6 +464,7 @@ XIncludeUtils::doXIncludeXMLFileDOM(const XMLCh *href,
     parser.setDoXInclude(false);
     /* create the schema info nodes, so that we can detect conflicting notations */
     parser.setCreateSchemaInfo(true);
+    parser.setDisableDefaultEntityResolution(true);
     XMLInternalErrorHandler xierrhandler;
     parser.setErrorHandler(&xierrhandler);
 
