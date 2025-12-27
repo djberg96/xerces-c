@@ -59,6 +59,7 @@ static bool                     doSchema        = true;
 static bool                     schemaFullChecking = false;
 static bool                     namespacePrefixes = false;
 static bool                     sortAttributes  = false;
+static bool                     loadExternalDTD = false;
 
 
 // ---------------------------------------------------------------------------
@@ -82,6 +83,8 @@ static void usage()
              "                NOTE: THIS IS OPPOSITE FROM OTHER SAMPLES.\n"
              "    -s          Disable schema processing. Defaults to on.\n"
              "                NOTE: THIS IS OPPOSITE FROM OTHER SAMPLES.\n"
+             "    -d          Enable loading of external DTDs. Defaults to off (secure).\n"
+
              "    -sa         Print the attributes in alphabetic order. Defaults to off.\n"
              "    -?          Show this help.\n\n"
              "  * = Default if not provided explicitly.\n\n"
@@ -204,6 +207,12 @@ int main(int argC, char* argV[])
         {
             sortAttributes = true;
         }
+         else if (!strcmp(argV[parmInd], "-d")
+              ||  !strcmp(argV[parmInd], "-D"))
+        {
+            loadExternalDTD = true;
+        }
+
          else
         {
             std::cerr << "Unknown option '" << argV[parmInd]
@@ -257,6 +266,9 @@ int main(int argC, char* argV[])
     {
         parser->setFeature(XMLUni::fgSAX2CoreValidation, true);
         parser->setFeature(XMLUni::fgXercesDynamic, false);
+    parser->setFeature(XMLUni::fgXercesLoadExternalDTD, loadExternalDTD);
+    parser->setFeature(XMLUni::fgXercesDisableDefaultEntityResolution, !loadExternalDTD);
+
     }
 
     parser->setFeature(XMLUni::fgSAX2CoreNameSpaces, doNamespaces);
@@ -264,6 +276,8 @@ int main(int argC, char* argV[])
     parser->setFeature(XMLUni::fgXercesHandleMultipleImports, true);
     parser->setFeature(XMLUni::fgXercesSchemaFullChecking, schemaFullChecking);
     parser->setFeature(XMLUni::fgSAX2CoreNameSpacePrefixes, namespacePrefixes);
+    parser->setFeature(XMLUni::fgXercesLoadExternalDTD, loadExternalDTD);
+    parser->setFeature(XMLUni::fgXercesDisableDefaultEntityResolution, !loadExternalDTD);
 
     //
     //  Create the handler object and install it as the document and error

@@ -58,6 +58,7 @@
 static bool                     doNamespaces        = false;
 static bool                     doSchema            = false;
 static bool                     schemaFullChecking  = false;
+static bool                     loadExternalDTD     = false;
 static const char*              encodingName    = "LATIN1";
 static XMLFormatter::UnRepFlags unRepFlags      = XMLFormatter::UnRep_CharRef;
 static char*                    xmlFile         = 0;
@@ -81,6 +82,7 @@ static void usage()
              "    -n          Enable namespace processing.\n"
              "    -s          Enable schema processing.\n"
              "    -f          Enable full schema constraint checking.\n"
+             "    -d          Enable loading of external DTDs. Defaults to off (secure).\n"
              "    -x=XXX      Use a particular encoding for output (LATIN1*).\n"
              "    -?          Show this help.\n\n"
              "  * = Default if not provided explicitly.\n\n"
@@ -165,6 +167,11 @@ int main(int argC, char* argV[])
         {
             schemaFullChecking = true;
         }
+         else if (!strcmp(argV[parmInd], "-d")
+              ||  !strcmp(argV[parmInd], "-D"))
+        {
+            loadExternalDTD = true;
+        }
          else if (!strncmp(argV[parmInd], "-x=", 3)
               ||  !strncmp(argV[parmInd], "-X=", 3))
         {
@@ -219,6 +226,8 @@ int main(int argC, char* argV[])
     parser->setDoSchema(doSchema);
     parser->setHandleMultipleImports (true);
     parser->setValidationSchemaFullChecking(schemaFullChecking);
+    parser->setLoadExternalDTD(loadExternalDTD);
+    parser->setDisableDefaultEntityResolution(!loadExternalDTD);
 
     //
     //  Create the handler object and install it as the document and error
