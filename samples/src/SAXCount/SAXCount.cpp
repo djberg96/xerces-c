@@ -44,6 +44,7 @@ void usage()
             "    -n          Enable namespace processing. Defaults to off.\n"
             "    -s          Enable schema processing. Defaults to off.\n"
             "    -f          Enable full schema constraint checking. Defaults to off.\n"
+            "    -d          Enable loading of external DTDs. Defaults to off (secure).\n"
             "    -locale=ll_CC specify the locale, default: en_US.\n"
 		    "    -?          Show this help.\n\n"
             "  * = Default if not provided explicitly.\n"
@@ -72,6 +73,7 @@ int main(int argC, char* argV[])
     bool                     doList = false;
     bool                     errorOccurred = false;
     bool                     recognizeNEL = false;
+    bool                     loadExternalDTD = false;
     char                     localeStr[64];
     memset(localeStr, 0, sizeof localeStr);
 
@@ -124,6 +126,11 @@ int main(int argC, char* argV[])
               ||  !strcmp(argV[argInd], "-L"))
         {
             doList = true;
+        }
+         else if (!strcmp(argV[argInd], "-d")
+              ||  !strcmp(argV[argInd], "-D"))
+        {
+            loadExternalDTD = true;
         }
          else if (!strcmp(argV[argInd], "-special:nel"))
         {
@@ -191,6 +198,9 @@ int main(int argC, char* argV[])
     parser->setDoSchema(doSchema);
     parser->setHandleMultipleImports (true);
     parser->setValidationSchemaFullChecking(schemaFullChecking);
+    parser->setLoadExternalDTD(loadExternalDTD);
+    parser->setDisableDefaultEntityResolution(!loadExternalDTD);
+
 
     //
     //  Create our SAX handler object and install it on the parser, as the

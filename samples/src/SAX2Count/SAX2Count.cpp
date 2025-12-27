@@ -52,6 +52,7 @@ void usage()
             "                NOTE: THIS IS OPPOSITE FROM OTHER SAMPLES.\n"
             "    -i          Disable identity constraint checking. Defaults to on.\n"
             "                NOTE: THIS IS OPPOSITE FROM OTHER SAMPLES.\n"
+            "    -d          Enable loading of external DTDs. Defaults to off (secure).\n"
             "    -locale=ll_CC specify the locale, default: en_US.\n"
             "    -?          Show this help.\n\n"
             "  * = Default if not provided explicitly.\n"
@@ -80,6 +81,8 @@ int main(int argC, char* argV[])
     bool                         identityConstraintChecking = true;
     bool                         doList = false;
     bool                         errorOccurred = false;
+    bool                         loadExternalDTD = false;
+
     bool                         namespacePrefixes = false;
     bool                         recognizeNEL = false;
     char                         localeStr[64];
@@ -144,6 +147,11 @@ int main(int argC, char* argV[])
               ||  !strcmp(argV[argInd], "-P"))
         {
             namespacePrefixes = true;
+        }
+         else if (!strcmp(argV[argInd], "-d")
+              ||  !strcmp(argV[argInd], "-D"))
+        {
+            loadExternalDTD = true;
         }
          else if (!strcmp(argV[argInd], "-special:nel"))
         {
@@ -211,6 +219,8 @@ int main(int argC, char* argV[])
     parser->setFeature(XMLUni::fgXercesSchemaFullChecking, schemaFullChecking);
     parser->setFeature(XMLUni::fgXercesIdentityConstraintChecking, identityConstraintChecking);
     parser->setFeature(XMLUni::fgSAX2CoreNameSpacePrefixes, namespacePrefixes);
+    parser->setFeature(XMLUni::fgXercesLoadExternalDTD, loadExternalDTD);
+    parser->setFeature(XMLUni::fgXercesDisableDefaultEntityResolution, !loadExternalDTD);
 
     if (valScheme == SAX2XMLReader::Val_Auto)
     {

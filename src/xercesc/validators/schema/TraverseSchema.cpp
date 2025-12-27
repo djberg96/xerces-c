@@ -639,6 +639,11 @@ void TraverseSchema::preprocessInclude(const DOMElement* const elem) {
     fParser->setUserEntityHandler(fEntityHandler);
     fParser->setUserErrorReporter(fErrorReporter);
 
+    // Security: Ensure external DTD loading is disabled to prevent XXE attacks
+    // when parsing potentially untrusted schema documents
+    fParser->setLoadExternalDTD(false);
+    fParser->setDisableDefaultEntityResolution(true);
+
     // Should just issue warning if the schema is not found
     bool flag = srcToFill->getIssueFatalErrorIfNotFound();
     srcToFill->setIssueFatalErrorIfNotFound(false);
@@ -852,6 +857,11 @@ void TraverseSchema::preprocessImport(const DOMElement* const elem) {
     fParser->setDoNamespaces(true);
     fParser->setUserEntityHandler(fEntityHandler);
     fParser->setUserErrorReporter(fErrorReporter);
+
+    // Security: Ensure external DTD loading is disabled to prevent XXE attacks
+    // when parsing potentially untrusted schema documents
+    fParser->setLoadExternalDTD(false);
+    fParser->setDisableDefaultEntityResolution(true);
 
     // Should just issue warning if the schema is not found
     bool flag = srcToFill->getIssueFatalErrorIfNotFound();
@@ -8190,6 +8200,11 @@ bool TraverseSchema::openRedefinedSchema(const DOMElement* const redefineElem) {
     fParser->setValidationScheme(XercesDOMParser::Val_Never);
     fParser->setDoNamespaces(true);
     fParser->setDisableDefaultEntityResolution(true);
+
+    // Security: Ensure external DTD loading is disabled to prevent XXE attacks
+    // when parsing potentially untrusted schema documents
+    fParser->setLoadExternalDTD(false);
+
     fParser->setUserEntityHandler(fEntityHandler);
     fParser->setUserErrorReporter(fErrorReporter);
 

@@ -11,6 +11,10 @@ changing the default parser configuration to be secure by default. Previously,
 the parser would load external DTDs and resolve external entities by default,
 making applications vulnerable to XXE attacks when processing untrusted XML.
 
+⚠️ BREAKING CHANGE: These security fixes change default behavior and may break
+existing applications that rely on loading external DTDs. See "BACKWARD
+COMPATIBILITY" section below for migration guidance.
+
 CHANGES MADE
 ------------
 
@@ -111,6 +115,12 @@ For applications that need to process external entities:
 
 TESTING
 -------
+⚠️ TEST SUITE STATUS:
+- 30 out of 80 tests fail with secure defaults
+- Failed tests rely on loading external DTDs (e.g., personal.xml with personal.dtd)
+- This is EXPECTED behavior - the security fix is working correctly
+- Applications must explicitly enable external DTD loading if needed
+
 Recommended testing with XXE payloads (in safe test environment):
 
 1. File disclosure test (should be blocked):
@@ -121,6 +131,12 @@ Recommended testing with XXE payloads (in safe test environment):
 
 3. Billion laughs test (should be controlled by SecurityManager):
    <!DOCTYPE lolz [<!ENTITY lol "lol"><!ENTITY lol2 "&lol;&lol;...">]>
+
+Verification Test Results (test_xxe_detailed):
+✅ External DTD loading: DISABLED by default
+✅ External SYSTEM entities: BLOCKED (prevented /etc/passwd disclosure)
+✅ Internal entities: PARSED (safe entity handling preserved)
+✅ Plain XML without DTD: PARSED (normal operation)
 
 SECURITY IMPACT
 ---------------
